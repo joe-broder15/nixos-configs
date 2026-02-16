@@ -36,6 +36,7 @@
     neofetch
     git
     tree
+    tmux
   ];
 
   networking = {
