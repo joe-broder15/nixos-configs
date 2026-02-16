@@ -107,11 +107,12 @@
     # DDNS client
     ddns-updater = {
       enable = true;
-      # environment = {
-      #   SERVER_ENABLED = "no";
-      #   CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
-      #   PERIOD = "5m";
-      # };
+      environment = {
+        SERVER_ENABLED = "yes";
+        # CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
+        PERIOD = "5m";
+        LISTENING_ADDRESS = "8001";
+      };
     };
   };
 
