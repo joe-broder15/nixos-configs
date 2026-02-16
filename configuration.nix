@@ -111,7 +111,6 @@
         SERVER_ENABLED = "yes";
         CONFIG_FILATH = "/etc/ddns-updater/config.json";
         PERIOD = "5m";
-        LISTENING_ADDRESS = "8000";
       };
     };
   };
