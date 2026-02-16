@@ -105,7 +105,7 @@
     };
 
     # DDNS client
-    services.ddns-updater = {
+    ddns-updater = {
       enable = true;
       # environment = {
       #   SERVER_ENABLED = "no";
