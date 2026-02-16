@@ -116,7 +116,8 @@
     };
   };
 
-  networking.firewall.enable = false;
+  networking.firewall.enable = true;
+  networking.firewall.allowedTCPPorts = [8000]; #ddns updater web ui
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
