@@ -117,7 +117,7 @@
   };
 
   # nginx stuff
-  {
+
   security.acme = {
     acceptTerms = true;
     defaults.email = "joe.broder@proton.me";
@@ -141,11 +141,13 @@
     };
   };
 
-  networking.firewall.allowedTCPPorts = [ 80 443 ];
-
+  networking.firewall.allowedTCPPorts = [
+    80
+    443
+  ];
 
   networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [8000]; #ddns updater web ui
+  networking.firewall.allowedTCPPorts = [ 8000 ]; # ddns updater web ui
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
