@@ -109,7 +109,7 @@
       enable = true;
       environment = {
         SERVER_ENABLED = "yes";
-        CONFIG_FILATH = "/etc/ddns-updater/config.json";
+        CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
         PERIOD = "5m";
       };
     };
