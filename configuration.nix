@@ -116,6 +116,34 @@
     };
   };
 
+  # nginx stuff
+  {
+  security.acme = {
+    acceptTerms = true;
+    defaults.email = "joe.broder@proton.me";
+  };
+
+  services.nginx = {
+    enable = true;
+
+    recommendedGzipSettings = true;
+    recommendedOptimisation = true;
+    recommendedProxySettings = true;
+    recommendedTlsSettings = true;
+
+    virtualHosts."plex.local.clubtropicalexcellent.vip" = {
+      enableACME = true;
+      forceSSL = true;
+
+      locations."/" = {
+        proxyPass = "https://127.0.0.1:32400/web";
+      };
+    };
+  };
+
+  networking.firewall.allowedTCPPorts = [ 80 443 ];
+
+
   networking.firewall.enable = true;
   networking.firewall.allowedTCPPorts = [8000]; #ddns updater web ui
 
