@@ -110,7 +110,7 @@
       environment = {
         SERVER_ENABLED = "yes";
         CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
-        PERIOD = "5m";
+        PERIOD = "1m";
         LOG_LEVEL = "debug";
       };
     };
