@@ -111,6 +111,7 @@
         SERVER_ENABLED = "yes";
         CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
         PERIOD = "5m";
+        LOG_LEVEL = "debug";
       };
     };
   };
