@@ -37,6 +37,7 @@
     git
     tree
     tmux
+    ddns-updater
   ];
 
   networking = {
@@ -101,6 +102,16 @@
       enable = true;
       user = "user";
       openFirewall = true;
+    };
+
+    # DDNS client
+    services.ddns-updater = {
+      enable = true;
+      # environment = {
+      #   SERVER_ENABLED = "no";
+      #   CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
+      #   PERIOD = "5m";
+      # };
     };
   };
 
