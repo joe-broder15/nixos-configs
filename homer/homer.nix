@@ -10,7 +10,7 @@
     settings = {
       title = "Club Tropical Excellent";
       subtitle = "Now on NixOS!";
-      logo = "assets/hibiscus.png";
+      logo = "./assets/hibiscus.png";
       columns = "1";
       services = [
         {
