@@ -143,12 +143,22 @@ in
     };
   };
 
-  # Example vhost using the wildcard cert
-  services.nginx.virtualHosts."aplex.${baseDomain}" = {
+  # plex host using the wildcard cert
+  services.nginx.virtualHosts."plex.${baseDomain}" = {
     forceSSL = true;
     useACMEHost = baseDomain; # tells nginx to use certs."example.com"
     locations."/" = {
       proxyPass = "http://127.0.0.1:32400";
+      proxyWebsockets = true;
+    };
+  };
+
+   # qbit
+  services.nginx.virtualHosts."qbittorrent.${baseDomain}" = {
+    forceSSL = true;
+    useACMEHost = baseDomain; # tells nginx to use certs."example.com"
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:8080";
       proxyWebsockets = true;
     };
   };
