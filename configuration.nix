@@ -9,6 +9,7 @@
     # Include the results of the hardware scan.
     /etc/nixos/hardware-configuration.nix
     ./proxy.nix
+    ./homer/homer.nix
   ];
 
   # Bootloader.
@@ -119,34 +120,6 @@
       };
     };
 
-    # Homer dashboard
-    homer = {
-      enable = true;
-      virtualHost = {
-        domain = "homer.local.clubtropicalexcellent.vip";
-        nginx.enable = true;
-      };
-      settings = {
-        title = "Homelab";
-        subtitle = "Dashboard";
-        columns = "3";
-        services = [
-          {
-            name = "Services";
-            items = [
-              {
-                name = "Plex";
-                url = "https://plex.local.clubtropicalexcellent.vip";
-              }
-              {
-                name = "qBittorrent";
-                url = "https://qbittorrent.local.clubtropicalexcellent.vip";
-              }
-            ];
-          }
-        ];
-      };
-    };
   };
 
   networking.firewall.allowedTCPPorts = [
