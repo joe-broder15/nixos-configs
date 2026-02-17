@@ -4,6 +4,9 @@
 
 { config, pkgs, ... }:
 
+let
+  baseDomain = "local.clubtropicalexcellent.vip";
+in
 {
   imports = [
     # Include the results of the hardware scan.
@@ -116,33 +119,39 @@
     };
   };
 
-  # nginx stuff
+  networking.firewall.allowedTCPPorts = [
+    8000
+    443
+    80
+  ]; # ddns updater web ui
+
+  services.nginx.enable = true;
 
   security.acme = {
     acceptTerms = true;
-    defaults.email = "joe.broder@proton.me";
-  };
+    defaults.email = "you@example.com";
 
-  services.nginx = {
-    enable = true;
+    # One cert object for the base zone, requesting a wildcard
+    certs."${baseDomain}" = {
+      domain = "*.${baseDomain}";
+      extraDomainNames = [ baseDomain ]; # also cover apex
+      dnsProvider = "namecheap"; # lego provider code
+      credentialsFile = "/etc/nixos/namecheap.env";
 
-    recommendedGzipSettings = true;
-    recommendedOptimisation = true;
-    recommendedProxySettings = true;
-    recommendedTlsSettings = true;
-
-    virtualHosts."plex.local.clubtropicalexcellent.vip" = {
-      enableACME = true;
-      forceSSL = true;
-
-      locations."/" = {
-        proxyPass = "http://127.0.0.1:32400/web";
-      };
+      # Make the resulting cert readable by nginx
+      group = config.services.nginx.group;
     };
   };
 
-  networking.firewall.enable = true;
-  networking.firewall.allowedTCPPorts = [ 8000 443 80]; # ddns updater web ui
+  # Example vhost using the wildcard cert
+  services.nginx.virtualHosts."aplex.${baseDomain}" = {
+    forceSSL = true;
+    useACMEHost = baseDomain; # tells nginx to use certs."example.com"
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:32400";
+      proxyWebsockets = true;
+    };
+  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
