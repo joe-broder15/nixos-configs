@@ -114,7 +114,7 @@
         CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
         PERIOD = "1m";
         LOG_LEVEL = "debug";
-        LISTENING_ADDRESS = 8081;
+        LISTENING_ADDRESS = "8081";
       };
     };
 
