@@ -129,7 +129,7 @@ in
 
   security.acme = {
     acceptTerms = true;
-    defaults.email = "you@example.com";
+    defaults.email = "joe.broder@proton.me";
 
     # One cert object for the base zone, requesting a wildcard
     certs."${baseDomain}" = {
