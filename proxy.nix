@@ -58,4 +58,14 @@ in
     useACMEHost = baseDomain;
     forceSSL = true;
   };
+
+  # SillyTavern host using the wildcard cert
+  services.nginx.virtualHosts."sillytavern.${baseDomain}" = {
+    forceSSL = true;
+    useACMEHost = baseDomain;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:8083";
+      proxyWebsockets = true;
+    };
+  };
 }

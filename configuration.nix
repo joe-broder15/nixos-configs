@@ -41,6 +41,7 @@
     tmux
     ddns-updater
     homer
+    sillytavern
   ];
 
   networking = {
@@ -120,9 +121,18 @@
       };
     };
 
+    sillytavern = {
+      enable = true;
+      port = 8083;
+      listen = true;
+      user = "user";
+    };
+
+
   };
 
   networking.firewall.allowedTCPPorts = [
+    8083
     8082
     8081
     8080
