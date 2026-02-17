@@ -119,9 +119,33 @@
       };
     };
 
-    # homer
+    # Homer dashboard
     homer = {
       enable = true;
+      virtualHost = {
+        domain = "homer.local.clubtropicalexcellent.vip";
+        nginx.enable = true;
+      };
+      settings = {
+        title = "Homelab";
+        subtitle = "Dashboard";
+        columns = "3";
+        services = [
+          {
+            name = "Services";
+            items = [
+              {
+                name = "Plex";
+                url = "https://plex.local.clubtropicalexcellent.vip";
+              }
+              {
+                name = "qBittorrent";
+                url = "https://qbittorrent.local.clubtropicalexcellent.vip";
+              }
+            ];
+          }
+        ];
+      };
     };
   };
 

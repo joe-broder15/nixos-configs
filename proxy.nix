@@ -52,4 +52,10 @@ in
       '';
     };
   };
+
+  # Homer host using the wildcard cert
+  services.nginx.virtualHosts."homer.${baseDomain}" = {
+    useACMEHost = baseDomain;
+    forceSSL = true;
+  };
 }
