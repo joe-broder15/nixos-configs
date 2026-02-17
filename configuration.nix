@@ -4,13 +4,11 @@
 
 { config, pkgs, ... }:
 
-let
-  baseDomain = "local.clubtropicalexcellent.vip";
-in
 {
   imports = [
     # Include the results of the hardware scan.
     /etc/nixos/hardware-configuration.nix
+    ./proxy.nix
   ];
 
   # Bootloader.
@@ -124,44 +122,6 @@ in
     443
     80
   ]; # ddns updater web ui
-
-  services.nginx.enable = true;
-
-  security.acme = {
-    acceptTerms = true;
-    defaults.email = "joe.broder@proton.me";
-
-    # One cert object for the base zone, requesting a wildcard
-    certs."${baseDomain}" = {
-      domain = "*.${baseDomain}";
-      extraDomainNames = [ baseDomain ]; # also cover apex
-      dnsProvider = "namecheap"; # lego provider code
-      credentialsFile = "/etc/nixos/namecheap.env";
-
-      # Make the resulting cert readable by nginx
-      group = config.services.nginx.group;
-    };
-  };
-
-  # plex host using the wildcard cert
-  services.nginx.virtualHosts."plex.${baseDomain}" = {
-    forceSSL = true;
-    useACMEHost = baseDomain; # tells nginx to use certs."example.com"
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:32400";
-      proxyWebsockets = true;
-    };
-  };
-
-   # qbit
-  services.nginx.virtualHosts."qbittorrent.${baseDomain}" = {
-    forceSSL = false;
-    useACMEHost = baseDomain; # tells nginx to use certs."example.com"
-    locations."/" = {
-      proxyPass = "http://127.0.0.1:8080";
-      proxyWebsockets = true;
-    };
-  };
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
