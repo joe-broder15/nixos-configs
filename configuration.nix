@@ -155,7 +155,7 @@ in
 
    # qbit
   services.nginx.virtualHosts."qbittorrent.${baseDomain}" = {
-    forceSSL = true;
+    forceSSL = false;
     useACMEHost = baseDomain; # tells nginx to use certs."example.com"
     locations."/" = {
       proxyPass = "http://127.0.0.1:8080";
