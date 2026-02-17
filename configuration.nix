@@ -114,17 +114,18 @@
         CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
         PERIOD = "1m";
         LOG_LEVEL = "debug";
+        LISTENING_ADDRESS = 8081;
       };
     };
 
     # homer
     homer = {
       enable = true;
-      port = 8081;
     };
   };
 
   networking.firewall.allowedTCPPorts = [
+    8081
     8000
     443
     80
