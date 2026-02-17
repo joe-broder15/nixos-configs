@@ -126,7 +126,7 @@
 
   networking.firewall.allowedTCPPorts = [
     8081
-    8000
+    8080
     443
     80
   ]; # ddns updater web ui
