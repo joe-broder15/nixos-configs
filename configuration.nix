@@ -97,6 +97,7 @@
       enable = true;
       openFirewall = true;
       user = "user";
+      webuiPort = 8082;
     };
 
     # Plex media server for streaming with firewall openings.
@@ -114,7 +115,7 @@
         CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
         PERIOD = "1m";
         LOG_LEVEL = "debug";
-        LISTENING_ADDRESS = "8081";
+        LISTENING_ADDRESS = ":8081";
       };
     };
 
@@ -125,6 +126,7 @@
   };
 
   networking.firewall.allowedTCPPorts = [
+    8082
     8081
     8080
     443
