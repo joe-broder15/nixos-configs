@@ -21,10 +21,8 @@
             }
             {
               name = "qBittorrent";
-              type = "qBittorrent";
-              rateInterval = 2000;
-              torrentInterval = 5000;
-              url = "127.0.0.1:8082";
+              url = "https://qBittorrent.local.clubtropicalexcellent.vip";
+
             }
           ];
         }
