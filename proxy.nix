@@ -37,7 +37,7 @@ in
     forceSSL = true;
     useACMEHost = baseDomain;
     locations."/" = {
-      proxyPass = "http://127.0.0.1:8080";
+      proxyPass = "http://127.0.0.1:8082";
       proxyWebsockets = true;
       extraConfig = ''
         # qBittorrent WebUI is sensitive to headers; these help:
