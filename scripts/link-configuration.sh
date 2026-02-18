@@ -1,21 +1,34 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# This repository is intended to live at /etc/nixos.
-EXPECTED_ROOT="/etc/nixos"
+# Sync tracked NixOS config files from this repository into /etc/nixos.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-CONFIG_FILE="${EXPECTED_ROOT}/configuration.nix"
+TARGET_ROOT="/etc/nixos"
 
-if [[ "${REPO_ROOT}" != "${EXPECTED_ROOT}" ]]; then
-  echo "Repository root is ${REPO_ROOT}" >&2
-  echo "This repo is expected to be cloned to ${EXPECTED_ROOT}" >&2
+FILES=(
+  "flake.nix"
+  "flake.lock"
+  "configuration.nix"
+  "proxy.nix"
+  "homer.nix"
+)
+
+echo "Syncing NixOS files from ${REPO_ROOT} to ${TARGET_ROOT}"
+sudo install -d -m 0755 "${TARGET_ROOT}"
+
+for file in "${FILES[@]}"; do
+  if [[ ! -f "${REPO_ROOT}/${file}" ]]; then
+    echo "Missing required source file: ${REPO_ROOT}/${file}" >&2
+    exit 1
+  fi
+
+  sudo install -m 0644 "${REPO_ROOT}/${file}" "${TARGET_ROOT}/${file}"
+done
+
+if [[ ! -f "${TARGET_ROOT}/hardware-configuration.nix" ]]; then
+  echo "Missing required host file: ${TARGET_ROOT}/hardware-configuration.nix" >&2
+  echo "Generate it with: sudo nixos-generate-config" >&2
   exit 1
 fi
 
-if [[ ! -f "${CONFIG_FILE}" ]]; then
-  echo "Missing ${CONFIG_FILE}" >&2
-  exit 1
-fi
-
-echo "Repository layout check passed at ${EXPECTED_ROOT}"
-echo "configuration.nix is present at ${CONFIG_FILE}"
+echo "Sync complete."
