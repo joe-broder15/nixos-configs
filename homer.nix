@@ -24,6 +24,10 @@
               url = "https://qBittorrent.local.clubtropicalexcellent.vip";
 
             }
+            {
+              name = "SillyTavern";
+              url = "https://sillytavern.local.clubtropicalexcellent.vip";
+            }
           ];
         }
       ];
