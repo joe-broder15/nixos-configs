@@ -7,7 +7,6 @@ TARGET_ROOT="/etc/nixos"
 
 FILES=(
   "flake.nix"
-  "flake.lock"
   "configuration.nix"
   "proxy.nix"
   "homer.nix"
