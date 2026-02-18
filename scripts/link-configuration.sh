@@ -1,17 +1,21 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Resolve repository root relative to this script.
+# This repository is intended to live at /etc/nixos.
+EXPECTED_ROOT="/etc/nixos"
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-SOURCE="${REPO_ROOT}/configuration.nix"
-TARGET="/etc/nixos/configuration.nix"
+CONFIG_FILE="${EXPECTED_ROOT}/configuration.nix"
 
-if [[ ! -f "${SOURCE}" ]]; then
-  echo "configuration.nix not found at ${SOURCE}" >&2
+if [[ "${REPO_ROOT}" != "${EXPECTED_ROOT}" ]]; then
+  echo "Repository root is ${REPO_ROOT}" >&2
+  echo "This repo is expected to be cloned to ${EXPECTED_ROOT}" >&2
   exit 1
 fi
 
-echo "Linking ${TARGET} -> ${SOURCE}"
-sudo ln -sf "${SOURCE}" "${TARGET}"
-echo "Done. Verify with: ls -l ${TARGET}"
+if [[ ! -f "${CONFIG_FILE}" ]]; then
+  echo "Missing ${CONFIG_FILE}" >&2
+  exit 1
+fi
 
+echo "Repository layout check passed at ${EXPECTED_ROOT}"
+echo "configuration.nix is present at ${CONFIG_FILE}"

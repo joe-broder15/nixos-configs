@@ -1,6 +1,7 @@
 # nixos-homelab
 
 Opinionated NixOS configuration for my homelab server.
+This repository is intended to be cloned directly to `/etc/nixos`.
 
 - `configuration.nix` is the main module for host/system settings.
 - `proxy.nix` contains nginx reverse-proxy and ACME certificate settings.
@@ -33,21 +34,21 @@ Create or copy these files on the machine before rebuilding.
 
 Two helper scripts live in `scripts/`:
 
-- `scripts/link-configuration.sh` – runs `sudo ln -sf` to replace `/etc/nixos/configuration.nix` with a symlink pointing at the repo copy. Run this after cloning or whenever you relocate the repo.
-- `scripts/pull-and-rebuild.sh` – runs `sudo git pull --ff-only` inside the repo and then `sudo nixos-rebuild switch`. Useful for quickly updating the host to match the latest commit.
+- `scripts/link-configuration.sh` – validates that the repository is located at `/etc/nixos` and that `/etc/nixos/configuration.nix` exists.
+- `scripts/pull-and-rebuild.sh` – runs `sudo git -C /etc/nixos pull --ff-only` and then `sudo nixos-rebuild switch --flake /etc/nixos#nixos`.
 
 Ensure both scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
 
 ## Rebuild commands
 
-- Non-flake rebuild (matches `scripts/pull-and-rebuild.sh`): `sudo nixos-rebuild switch`
-- Flake rebuild (using this repo's flake output): `sudo nixos-rebuild switch --flake .#nixos`
+- Flake rebuild (matches `scripts/pull-and-rebuild.sh`): `sudo nixos-rebuild switch --flake /etc/nixos#nixos`
 
 ## Typical workflow
 
 1. Clone the repository onto the host.
-2. Run `./scripts/link-configuration.sh` to point `/etc/nixos/configuration.nix` at the tracked file.
-3. Edit or update the configuration as needed.
-4. Execute `./scripts/pull-and-rebuild.sh` to fetch the latest changes and rebuild the system.
+2. Clone it into `/etc/nixos` (or move it there).
+3. Run `./scripts/link-configuration.sh` to validate the expected layout.
+4. Edit or update the configuration as needed.
+5. Execute `./scripts/pull-and-rebuild.sh` to fetch the latest changes and rebuild the system from the flake.
 
 After each rebuild, verify that services (nginx, ACME issuance, DDNS updater, Plex, qbittorrent, WireGuard, CIFS mount) are healthy.
