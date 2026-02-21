@@ -14,6 +14,7 @@
       services = [
         {
           name = "Services";
+          icon = "fas fa-server";
           items = [
             {
               name = "Plex";
