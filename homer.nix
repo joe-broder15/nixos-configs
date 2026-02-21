@@ -17,18 +17,18 @@
           items = [
             {
               name = "Plex";
-              icon = "fab fa play";
+              icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/plex.png";
               url = "https://plex.local.clubtropicalexcellent.vip";
             }
             {
               name = "qBittorrent";
-              icon = "fab fa skull-crossbones";
+              icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/qbittorrent.png";
               url = "https://qBittorrent.local.clubtropicalexcellent.vip";
 
             }
             {
               name = "SillyTavern";
-              icon = "fab fa beer-mug-empty";
+              icon = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/sillytavern.png";
               url = "https://sillytavern.local.clubtropicalexcellent.vip";
             }
           ];
