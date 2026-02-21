@@ -82,6 +82,8 @@
     LC_TIME = "en_US.UTF-8";
   };
 
+  boot.kernel.sysctl."net.ipv4.ip_forward" = 1;
+
   # Configure keymap in X11
   services = {
     # Keyboard layout for any X11 sessions.
