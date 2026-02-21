@@ -42,6 +42,7 @@
     ddns-updater
     homer
     sillytavern
+    tailscale
   ];
 
   networking = {
@@ -127,6 +128,11 @@
       listen = true;
       user = "user";
     };
+
+    tailscale = {
+      enable = true;
+      useRoutingFeatures = true;
+    }
 
   };
 
