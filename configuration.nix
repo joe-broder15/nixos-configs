@@ -132,7 +132,7 @@
     tailscale = {
       enable = true;
       useRoutingFeatures = true;
-    }
+    };
 
   };
 
