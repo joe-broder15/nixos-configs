@@ -133,9 +133,9 @@
 
     resilio = {
       enable = true;
-      services.resilio.enableWebUI = true; # To run the WebUI
-      services.resilio.httpListenAddr = "127.0.0.1";
-      services.resilio.httpListenPort = 9999; 
+      enableWebUI = true; # To run the WebUI
+      httpListenAddr = "127.0.0.1";
+      httpListenPort = 9999; 
     };
 
     # tailscale = {
