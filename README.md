@@ -27,8 +27,24 @@ Create or copy these files on the machine before rebuilding.
 - DDNS Updater service and web UI.
 - qbittorrent headless client.
 - Plex Media Server.
+- Resilio Sync with WebUI and shared-folder root at `/resilio-shared-folders`.
 - CIFS mount for `//192.168.1.99/Library1`.
 - Miscellaneous CLI tooling: `vim`, `wget`, `htop`, `neofetch`, `tree`, `wireguard-tools`, etc.
+
+## Service URLs
+
+- Homer: `https://homer.local.clubtropicalexcellent.vip`
+- Plex: `https://plex.local.clubtropicalexcellent.vip`
+- qBittorrent: `https://qbittorrent.local.clubtropicalexcellent.vip`
+- SillyTavern: `https://sillytavern.local.clubtropicalexcellent.vip`
+- Resilio Sync: `https://resilio.local.clubtropicalexcellent.vip`
+- DDNS Updater: `https://ddns.local.clubtropicalexcellent.vip`
+
+## Resilio notes
+
+- Resilio WebUI listens on `127.0.0.1:9999` and is exposed through nginx.
+- The shared folder root is `/resilio-shared-folders`.
+- The directory is created declaratively via `systemd.tmpfiles` with ownership `rslsync:rslsync`.
 
 ## Scripts
 
@@ -50,4 +66,4 @@ Ensure both scripts are executable (`chmod +x scripts/*.sh`). They assume the re
 3. Edit or update the configuration as needed.
 4. Execute `./scripts/pull-and-rebuild.sh` to fetch the latest changes and rebuild the system from the flake.
 
-After each rebuild, verify that services (nginx, ACME issuance, DDNS updater, Plex, qbittorrent, WireGuard, CIFS mount) are healthy.
+After each rebuild, verify that services (nginx, ACME issuance, DDNS updater, Resilio Sync, Plex, qbittorrent, WireGuard, CIFS mount) are healthy.

@@ -78,4 +78,14 @@ in
       proxyWebsockets = true;
     };
   };
+
+  # DDNS Updater host using the wildcard cert
+  services.nginx.virtualHosts."ddns.${baseDomain}" = {
+    forceSSL = true;
+    useACMEHost = baseDomain;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:8081";
+      proxyWebsockets = true;
+    };
+  };
 }

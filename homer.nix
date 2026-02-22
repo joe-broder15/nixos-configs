@@ -37,6 +37,11 @@
               logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/resiliosync.png";
               url = "https://resilio.local.clubtropicalexcellent.vip";
             }
+            {
+              name = "DDNS Updater";
+              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/ddns-updater.png";
+              url = "https://ddns.local.clubtropicalexcellent.vip";
+            }
           ];
         }
       ];
