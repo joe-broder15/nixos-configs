@@ -94,7 +94,7 @@ in
     forceSSL = true;
     useACMEHost = baseDomain;
     locations."/" = {
-      proxyPass = "https://192.168.1.99:8006";
+      proxyPass = "https://192.168.1.100:8006";
       proxyWebsockets = true;
       extraConfig = ''
         # Proxmox upstream commonly uses a self-signed TLS certificate.
