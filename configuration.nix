@@ -136,6 +136,7 @@
       enableWebUI = true; # To run the WebUI
       httpListenAddr = "127.0.0.1";
       httpListenPort = 9999; 
+      directoryRoot = "/resilio-storage";
     };
 
     # tailscale = {
@@ -146,10 +147,6 @@
   };
 
   networking.firewall.allowedTCPPorts = [
-    # 8083
-    # 8082
-    # 8081
-    # 8080
     443
     80
   ]; # ddns updater web ui
