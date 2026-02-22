@@ -68,4 +68,14 @@ in
       proxyWebsockets = true;
     };
   };
+
+  # Resilio Sync host using the wildcard cert
+  services.nginx.virtualHosts."resilio.${baseDomain}" = {
+    forceSSL = true;
+    useACMEHost = baseDomain;
+    locations."/" = {
+      proxyPass = "http://127.0.0.1:9999";
+      proxyWebsockets = true;
+    };
+  };
 }

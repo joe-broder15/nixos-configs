@@ -43,6 +43,7 @@
     homer
     sillytavern
     tailscale
+    resilio-sync
   ];
 
   networking = {
@@ -109,7 +110,6 @@
     plex = {
       enable = true;
       user = "user";
-      openFirewall = true;
     };
 
     # DDNS client
@@ -131,6 +131,13 @@
       user = "user";
     };
 
+    resilio = {
+      enable = true;
+      services.resilio.enableWebUI = true; # To run the WebUI
+      services.resilio.httpListenAddr = "127.0.0.1";
+      services.resilio.httpListenPort = 9999; 
+    };
+
     # tailscale = {
     #   enable = true;
     #   useRoutingFeatures = "server";
@@ -139,10 +146,10 @@
   };
 
   networking.firewall.allowedTCPPorts = [
-    8083
-    8082
-    8081
-    8080
+    # 8083
+    # 8082
+    # 8081
+    # 8080
     443
     80
   ]; # ddns updater web ui

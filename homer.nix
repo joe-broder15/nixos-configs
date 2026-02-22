@@ -32,6 +32,11 @@
               logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/sillytavern.png";
               url = "https://sillytavern.local.clubtropicalexcellent.vip";
             }
+            {
+              name = "Resilio Sync";
+              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/resiliosync.png";
+              url = "https://resilio.local.clubtropicalexcellent.vip";
+            }
           ];
         }
       ];
