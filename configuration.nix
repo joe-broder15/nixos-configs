@@ -135,8 +135,7 @@
       enable = true;
       enableWebUI = true; # To run the WebUI
       httpListenAddr = "127.0.0.1";
-      httpListenPort = 9999; 
-      directoryRoot = "/resilio-storage";
+      httpListenPort = 9999;
     };
 
     # tailscale = {
