@@ -135,7 +135,8 @@
       enable = true;
       enableWebUI = true; # To run the WebUI
       httpListenAddr = "127.0.0.1";
-      httpListenPort = 9999;
+      httpListenPort = 9999; 
+      directoryRoot = "/resilio-shared-folders";
     };
 
     # tailscale = {
@@ -160,6 +161,10 @@
     ];
     packages = with pkgs; [ ];
   };
+
+  systemd.tmpfiles.rules = [
+    "d /resilio-shared-folders 0750 rslsync rslsync -"
+  ];
 
   # map network shares
   fileSystems."/mnt/Library1" = {
