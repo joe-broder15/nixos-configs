@@ -42,6 +42,11 @@
               logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/ddns-updater.png";
               url = "https://ddns.local.clubtropicalexcellent.vip";
             }
+            {
+              name = "Proxmox";
+              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/proxmox.png";
+              url = "https://proxmox.local.clubtropicalexcellent.vip";
+            }
           ];
         }
       ];

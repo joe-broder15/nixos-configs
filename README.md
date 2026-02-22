@@ -39,6 +39,7 @@ Create or copy these files on the machine before rebuilding.
 - SillyTavern: `https://sillytavern.local.clubtropicalexcellent.vip`
 - Resilio Sync: `https://resilio.local.clubtropicalexcellent.vip`
 - DDNS Updater: `https://ddns.local.clubtropicalexcellent.vip`
+- Proxmox: `https://proxmox.local.clubtropicalexcellent.vip`
 
 ## Resilio notes
 
