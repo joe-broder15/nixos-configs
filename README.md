@@ -52,18 +52,18 @@ Create or copy these files on the machine before rebuilding.
 
 One helper script lives in `scripts/`:
 
-- `scripts/pull-and-rebuild.sh` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `sudo nixos-rebuild switch --flake <repo-root>#homelab`.
+- `scripts/pull-and-rebuild.sh <closure>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), validates `<closure>` against `nixosConfigurations` in the local flake, then runs `sudo nixos-rebuild switch --flake <repo-root>#<closure>`.
 
 Ensure scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
 
 ## Rebuild commands
 
-- Flake rebuild (matches `scripts/pull-and-rebuild.sh`): `sudo nixos-rebuild switch --flake /path/to/nixos-homelab#homelab`
+- Flake rebuild (matches `scripts/pull-and-rebuild.sh homelab`): `sudo nixos-rebuild switch --flake /path/to/nixos-homelab#homelab`
 
 ## Typical workflow
 
 1. Clone the repository onto the host.
 2. Edit or update the configuration as needed.
-3. Execute `./scripts/pull-and-rebuild.sh` to fetch the latest changes and rebuild the system from the local flake.
+3. Execute `./scripts/pull-and-rebuild.sh homelab` to fetch the latest changes and rebuild the system from the local flake.
 
 After each rebuild, verify that services (nginx, ACME issuance, DDNS updater, Resilio Sync, Plex, qbittorrent, WireGuard, CIFS mount) are healthy.
