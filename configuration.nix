@@ -110,6 +110,7 @@
     plex = {
       enable = true;
       user = "user";
+      openFirewall = true;
     };
 
     # DDNS client
@@ -149,7 +150,6 @@
   networking.firewall.allowedTCPPorts = [
     443
     80
-    32400 #Plex port for remote access
   ]; # ddns updater web ui
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
