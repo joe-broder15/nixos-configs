@@ -44,6 +44,7 @@
     sillytavern
     tailscale
     resilio-sync
+    clamav
   ];
 
   networking = {
@@ -140,17 +141,20 @@
       directoryRoot = "/resilio-shared-folders";
     };
 
-    # tailscale = {
-    #   enable = true;
-    #   useRoutingFeatures = "server";
-    # };
+    clamav = {
+      scanner.enable = true;
+      daemon.enable = true;
+    }
 
   };
 
-  networking.firewall.allowedTCPPorts = [
-    443
-    80
-  ]; # ddns updater web ui
+  networking.firewall = {
+    enable = true;
+    allowedTCPPorts = [
+      443
+      80
+    ];
+  }; # ddns updater web ui
 
   # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.user = {
