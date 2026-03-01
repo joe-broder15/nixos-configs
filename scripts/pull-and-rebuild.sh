@@ -10,6 +10,13 @@ if [[ ! -d "${REPO_ROOT}/.git" ]]; then
   exit 1
 fi
 
+if [[ ! -w "${REPO_ROOT}/.git" ]]; then
+  echo "Repository metadata is not writable: ${REPO_ROOT}/.git" >&2
+  echo "Fix ownership, then rerun:" >&2
+  echo "  sudo chown -R \"$(id -un):$(id -gn)\" \"${REPO_ROOT}\"" >&2
+  exit 1
+fi
+
 echo "Using repository at ${REPO_ROOT}"
 git -C "${REPO_ROOT}" pull --ff-only
 
