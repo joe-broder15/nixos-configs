@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Pull latest changes from this repository, sync to /etc/nixos, rebuild.
+# Pull latest changes from this repository and rebuild from the local flake.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-TARGET_ROOT="/etc/nixos"
-FLAKE_TARGET="${TARGET_ROOT}#homelab"
+FLAKE_TARGET="${REPO_ROOT}#homelab"
 
 if [[ ! -d "${REPO_ROOT}/.git" ]]; then
   echo "Expected a git repository at ${REPO_ROOT}" >&2
@@ -12,10 +11,7 @@ if [[ ! -d "${REPO_ROOT}/.git" ]]; then
 fi
 
 echo "Using repository at ${REPO_ROOT}"
-sudo git -C "${REPO_ROOT}" pull --ff-only
-
-echo "Syncing repository files to ${TARGET_ROOT}"
-"${REPO_ROOT}/scripts/link-configuration.sh"
+git -C "${REPO_ROOT}" pull --ff-only
 
 echo "Rebuilding system configuration from flake target ${FLAKE_TARGET}"
 sudo nixos-rebuild switch --flake "${FLAKE_TARGET}"

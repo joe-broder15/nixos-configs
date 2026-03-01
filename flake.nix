@@ -15,7 +15,8 @@
       nixosConfigurations.homelab = nixpkgs.lib.nixosSystem {
         inherit system;
         modules = [
-          ./homelab/configuration.nix
+          ./machines/proxmox-vm.nix
+          ./configurations/homelab/configuration.nix
         ];
       };
 

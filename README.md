@@ -1,10 +1,11 @@
 # nixos-homelab
 
 Opinionated NixOS configuration for my homelab server.
-This repository can be cloned anywhere. Helper scripts sync flake files into `/etc/nixos` and module files into `/etc/nixos/homelab` before rebuilds.
+This repository can be cloned anywhere and rebuilt directly from its local flake output.
 
-- `homelab/configuration.nix` is the main module for host/system settings.
-- `homelab/proxy.nix` contains nginx reverse-proxy and ACME certificate settings.
+- `configurations/homelab/configuration.nix` is the main module for host/system settings.
+- `configurations/homelab/proxy.nix` contains nginx reverse-proxy and ACME certificate settings.
+- `machines/proxmox-vm.nix` contains the Proxmox VM hardware profile.
 - `flake.nix` (repo root) exposes `nixosConfigurations.homelab` for flake-based rebuilds.
 
 ## Supporting files that must exist on the host
@@ -49,22 +50,20 @@ Create or copy these files on the machine before rebuilding.
 
 ## Scripts
 
-Two helper scripts live in `scripts/`:
+One helper script lives in `scripts/`:
 
-- `scripts/link-configuration.sh` – copies tracked flake files (`flake.nix`, `flake.lock`) into `/etc/nixos`, copies module files (`homelab/configuration.nix`, `homelab/proxy.nix`, `homelab/homer.nix`) into `/etc/nixos/homelab`, and validates `hardware-configuration.nix` exists in `/etc/nixos`.
-- `scripts/pull-and-rebuild.sh` – runs `sudo git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), executes `scripts/link-configuration.sh`, then runs `sudo nixos-rebuild switch --flake /etc/nixos#homelab`.
+- `scripts/pull-and-rebuild.sh` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `sudo nixos-rebuild switch --flake <repo-root>#homelab`.
 
-Ensure both scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
+Ensure scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
 
 ## Rebuild commands
 
-- Flake rebuild (matches `scripts/pull-and-rebuild.sh`): `sudo nixos-rebuild switch --flake /etc/nixos#homelab`
+- Flake rebuild (matches `scripts/pull-and-rebuild.sh`): `sudo nixos-rebuild switch --flake /path/to/nixos-homelab#homelab`
 
 ## Typical workflow
 
 1. Clone the repository onto the host.
-2. Run `./scripts/link-configuration.sh` to sync tracked files into `/etc/nixos` and `/etc/nixos/homelab`.
-3. Edit or update the configuration as needed.
-4. Execute `./scripts/pull-and-rebuild.sh` to fetch the latest changes and rebuild the system from the flake.
+2. Edit or update the configuration as needed.
+3. Execute `./scripts/pull-and-rebuild.sh` to fetch the latest changes and rebuild the system from the local flake.
 
 After each rebuild, verify that services (nginx, ACME issuance, DDNS updater, Resilio Sync, Plex, qbittorrent, WireGuard, CIFS mount) are healthy.
