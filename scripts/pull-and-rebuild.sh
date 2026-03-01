@@ -4,7 +4,7 @@ set -euo pipefail
 # Pull latest changes from this repository, sync to /etc/nixos, rebuild.
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 TARGET_ROOT="/etc/nixos"
-FLAKE_TARGET="${TARGET_ROOT}#nixos"
+FLAKE_TARGET="${TARGET_ROOT}#homelab"
 
 if [[ ! -d "${REPO_ROOT}/.git" ]]; then
   echo "Expected a git repository at ${REPO_ROOT}" >&2
