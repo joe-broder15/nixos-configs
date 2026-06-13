@@ -20,6 +20,14 @@
         ];
       };
 
+      nixosConfigurations.thinkpad = nixpkgs.lib.nixosSystem {
+        inherit system;
+        modules = [
+          ./machines/thinkpad-t14.nix
+          ./configurations/thinkpad/configuration.nix
+        ];
+      };
+
       formatter.${system} = pkgs.nixfmt;
     };
 }

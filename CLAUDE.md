@@ -1,4 +1,4 @@
-# NixOS Homelab
+# NixOS Configurations
 
 This repo defines NixOS configurations for homelab machines, built with flakes.
 
@@ -12,15 +12,18 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 ```
 .
 ├── README.md                              # Repo overview, supporting files, services, and workflow docs.
-├── flake.nix                              # Defines the `homelab` nixosConfiguration from a machine + software config.
+├── flake.nix                              # Defines nixosConfigurations for homelab and thinkpad.
 ├── flake.lock                             # Pinned input versions for the flake.
 ├── configurations/
-│   └── homelab/
-│       ├── configuration.nix              # Main host module: packages, networking, users, and service options.
-│       ├── homer.nix                      # Homer dashboard config listing links to other services.
-│       └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
+│   ├── homelab/
+│   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options.
+│   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
+│   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
+│   └── thinkpad/
+│       └── configuration.nix              # ThinkPad T14 desktop configuration with KDE Plasma.
 ├── machines/
-│   └── proxmox-vm.nix                     # Generated hardware profile for the Proxmox VM.
+│   ├── proxmox-vm.nix                     # Generated hardware profile for the Proxmox VM.
+│   └── thinkpad-t14.nix                   # Generated hardware profile for the ThinkPad T14.
 └── scripts/
     └── pull-and-rebuild.sh                # Pulls latest changes and runs nixos-rebuild switch for a given configuration.
 ```
