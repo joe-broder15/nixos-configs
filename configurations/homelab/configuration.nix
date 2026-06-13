@@ -172,15 +172,17 @@
 
   # Work around the sillytavern module symlinking config.yaml into the
   # read-only Nix store, which makes SillyTavern unable to update it.
-  # Copy the default config into the state directory instead, so it's writable.
-  systemd.tmpfiles.settings.sillytavern."/var/lib/SillyTavern/config.yaml" = lib.mkForce {
-    "C+" = {
-      mode = "0600";
-      user = "user";
-      group = "sillytavern";
-      argument = "${pkgs.sillytavern}/lib/node_modules/sillytavern/config.yaml";
-    };
-  };
+  # Disable the upstream symlink and replace any existing symlink (from a
+  # previous activation) with a real, writable copy before each start.
+  systemd.tmpfiles.settings.sillytavern."/var/lib/SillyTavern/config.yaml" = lib.mkForce { };
+
+  systemd.services.sillytavern.preStart = ''
+    if [ -L /var/lib/SillyTavern/config.yaml ] || [ ! -e /var/lib/SillyTavern/config.yaml ]; then
+      rm -f /var/lib/SillyTavern/config.yaml
+      cp ${pkgs.sillytavern}/lib/node_modules/sillytavern/config.yaml /var/lib/SillyTavern/config.yaml
+      chmod 600 /var/lib/SillyTavern/config.yaml
+    fi
+  '';
 
   # map network shares
   fileSystems."/mnt/Library1" = {
