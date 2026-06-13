@@ -2,7 +2,7 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   imports = [
@@ -169,6 +169,18 @@
   systemd.tmpfiles.rules = [
     "d /resilio-shared-folders 0750 rslsync rslsync -"
   ];
+
+  # Work around the sillytavern module symlinking config.yaml into the
+  # read-only Nix store, which makes SillyTavern unable to update it.
+  # Copy the default config into the state directory instead, so it's writable.
+  systemd.tmpfiles.settings.sillytavern."/var/lib/SillyTavern/config.yaml" = lib.mkForce {
+    "C+" = {
+      mode = "0600";
+      user = "user";
+      group = "sillytavern";
+      argument = "${pkgs.sillytavern}/lib/node_modules/sillytavern/config.yaml";
+    };
+  };
 
   # map network shares
   fileSystems."/mnt/Library1" = {
