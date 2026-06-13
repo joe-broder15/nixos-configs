@@ -17,6 +17,26 @@ NixOS configuration for ThinkPad T14 laptop with KDE Plasma desktop.
 
 The `flake.nix` (repo root) exposes both configurations as `nixosConfigurations.homelab` and `nixosConfigurations.thinkpad` for flake-based rebuilds.
 
+## Home Manager
+
+The `zircon` user's Home Manager configuration is tracked in this repo at `home/zircon.nix` and exposed from the root `flake.nix` as `homeConfigurations.zircon`.
+
+It can be used in two ways:
+
+- **Standalone** — on any machine with Nix installed (it does *not* have to be NixOS). A non-NixOS user can apply it directly from this repo:
+
+  ```sh
+  # First time, without home-manager installed:
+  nix run home-manager/master -- switch --flake /path/to/nixos-configs#zircon
+
+  # Once home-manager is on PATH:
+  home-manager switch --flake /path/to/nixos-configs#zircon
+  ```
+
+- **NixOS-integrated (thinkpad)** — the `thinkpad` configuration imports the Home Manager NixOS module and activates the `zircon` profile automatically on every `nixos-rebuild switch`, so no separate `home-manager` command is needed there.
+
+Both paths share the same `home/zircon.nix` module, so changes apply consistently regardless of how it is built.
+
 ## Supporting files that must exist on the host
 
 ### homelab configuration
@@ -63,9 +83,10 @@ Create or copy these files on the machine before rebuilding.
 
 ## Scripts
 
-One helper script lives in `scripts/`:
+Two helper scripts live in `scripts/`:
 
 - `scripts/pull-and-rebuild.sh <closure>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), validates `<closure>` against `nixosConfigurations` in the local flake, then runs `sudo nixos-rebuild switch --flake <repo-root>#<closure>`.
+- `scripts/pull-and-rebuild-home.sh <name>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `home-manager switch --flake <repo-root>#<name>` for a `homeConfigurations` entry (e.g. `zircon`). No `sudo`, since Home Manager activates as the invoking user.
 
 Ensure scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
 
