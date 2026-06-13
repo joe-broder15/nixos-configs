@@ -179,7 +179,7 @@
   systemd.services.sillytavern.preStart = ''
     if [ -L /var/lib/SillyTavern/config.yaml ] || [ ! -e /var/lib/SillyTavern/config.yaml ]; then
       rm -f /var/lib/SillyTavern/config.yaml
-      cp ${pkgs.sillytavern}/lib/node_modules/sillytavern/config.yaml /var/lib/SillyTavern/config.yaml
+      cp ${pkgs.sillytavern}/lib/node_modules/sillytavern/default/config.yaml /var/lib/SillyTavern/config.yaml
       chmod 600 /var/lib/SillyTavern/config.yaml
     fi
   '';
