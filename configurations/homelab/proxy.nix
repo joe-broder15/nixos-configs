@@ -15,7 +15,7 @@ in
       domain = "*.${baseDomain}";
       extraDomainNames = [ baseDomain ]; # also cover apex
       dnsProvider = "namecheap"; # lego provider code
-      credentialsFile = "/etc/nixos/namecheap.env";
+      environmentFile = "/etc/nixos/namecheap.env";
 
       # Make the resulting cert readable by nginx
       group = config.services.nginx.group;
