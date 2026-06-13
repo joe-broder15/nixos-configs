@@ -33,7 +33,7 @@
     wireguard-tools
     plex
     htop
-    neowofetch
+    fastfetch
     git
     tree
     tmux
