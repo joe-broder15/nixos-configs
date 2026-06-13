@@ -33,7 +33,7 @@
     wireguard-tools
     plex
     htop
-    neofetch
+    neowofetch
     git
     tree
     tmux
@@ -151,6 +151,7 @@
     allowedTCPPorts = [
       443
       80
+      22
     ];
   }; # ddns updater web ui
 
