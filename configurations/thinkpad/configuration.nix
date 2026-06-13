@@ -73,7 +73,8 @@
     keepassxc
     claude-code
     protonmail-desktop
-    protonvpn-gui
+    proton-vpn
+    signal-desktop
     home-manager
   ];
 
