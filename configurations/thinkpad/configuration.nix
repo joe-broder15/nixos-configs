@@ -61,24 +61,12 @@
 
   environment.systemPackages = with pkgs; [
     vim
-    wget
-    vscode
-    brave
     git
+    wget
     zsh
-    tmux
-    terminator
-    discord
     resilio-sync
-    keepassxc
-    claude-code
-    protonmail-desktop
-    proton-vpn
-    signal-desktop
     home-manager
   ];
-
-  programs.steam.enable = true;
 
   services.resilio = {
     enable = true;

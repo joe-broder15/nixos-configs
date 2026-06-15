@@ -17,8 +17,18 @@
 
   # The home.packages option allows you to install Nix packages into your
   # environment.
-  home.packages = [
-    pkgs.spotify
+  home.packages = with pkgs; [
+    spotify
+    tmux
+    vscode
+    brave
+    terminator
+    discord
+    signal-desktop
+    protonmail-desktop
+    proton-vpn
+    keepassxc
+    claude-code
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -70,6 +80,12 @@
   #
   home.sessionVariables = {
     # EDITOR = "emacs";
+  };
+
+  programs.git = {
+    enable = true;
+    userName = "joe-broder15";
+    userEmail = "joe.broder@proton.me";
   };
 
   # Let Home Manager install and manage itself.
