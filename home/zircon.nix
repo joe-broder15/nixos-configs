@@ -1,6 +1,10 @@
 { config, pkgs, ... }:
 
 {
+  imports = [
+    ./shell.nix
+  ];
+
   # Home Manager needs a bit of information about you and the paths it should
   # manage.
   home.username = "zircon";
@@ -23,6 +27,7 @@
     vscode
     brave
     terminator
+    nerd-fonts.gohufont
     discord
     signal-desktop
     protonmail-desktop
@@ -53,6 +58,26 @@
   # Home Manager is pretty good at managing dotfiles. The primary way to manage
   # plain files is through 'home.file'.
   home.file = {
+    # Terminator config: use the Gohu Nerd Font installed above. GohuFont is a
+    # bitmap font, so the point size must match an available size (11 or 14).
+    ".config/terminator/config".text = ''
+      [global_config]
+      [keybindings]
+      [profiles]
+        [[default]]
+          use_system_font = False
+          font = GohuFont 11 Nerd Font Mono 11
+      [layouts]
+        [[default]]
+          [[[window0]]]
+            type = Window
+            parent = ""
+          [[[child1]]]
+            type = Terminal
+            parent = window0
+      [plugins]
+    '';
+
     # # Building this configuration will create a copy of 'dotfiles/screenrc' in
     # # the Nix store. Activating the configuration will then make '~/.screenrc' a
     # # symlink to the Nix store copy.
@@ -89,65 +114,6 @@
     enable = true;
     userName = "joe-broder15";
     userEmail = "joe.broder@proton.me";
-  };
-
-  programs.zsh = {
-    enable = true;
-    enableCompletion = true;
-    autosuggestion.enable = true;
-    syntaxHighlighting.enable = true;
-
-    shellAliases = {
-      ll = "ls -lah";
-      gs = "git status";
-      hms = "home-manager switch";
-    };
-
-    history = {
-      size = 10000;
-      save = 10000;
-      ignoreDups = true;
-      share = true; # share history across sessions
-    };
-
-    initExtra = ''
-      # anything that needs to go in .zshrc verbatim
-      bindkey -e  # emacs keybindings (or -v for vi)
-    '';
-  };
-
-  # If login shell is bash (non-nix systems), auto-launch zsh
-  programs.bash = {
-    enable = true;
-    bashrcExtra = ''
-      if [[ -z "$ZSH_VERSION" && $- == *i* ]]; then
-        exec zsh
-      fi
-    '';
-  };
-
-  programs.starship = {
-    enable = true;
-    enableZshIntegration = true;
-    settings = {
-      add_newline = false;
-      format = "$directory$git_branch$git_status$character";
-
-      character = {
-        success_symbol = "[❯](bold green)";
-        error_symbol = "[❯](bold red)";
-      };
-
-      directory = {
-        truncation_length = 3;
-        truncate_to_repo = true;
-      };
-
-      git_branch = {
-        symbol = " ";
-        format = "[$symbol$branch]($style) ";
-      };
-    };
   };
 
   # Let Home Manager install and manage itself.
