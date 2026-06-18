@@ -7,6 +7,11 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    plasma-manager = {
+      url = "github:nix-community/plasma-manager";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs =
@@ -14,6 +19,7 @@
       self,
       nixpkgs,
       home-manager,
+      plasma-manager,
       ...
     }:
     let
@@ -41,6 +47,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.sharedModules = [ plasma-manager.homeModules.plasma-manager ];
             home-manager.users.zircon = import ./home/zircon.nix;
           }
         ];
@@ -50,7 +57,7 @@
       # (not just NixOS) via:
       #   nix run home-manager/master -- switch --flake .#zircon
       #   home-manager switch --flake .#zircon
-      homeConfigurations."zircon" = home-manager.lib.homeManagerConfiguration {
+      homeConfigurations.zircon = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
         modules = [ ./home/zircon.nix ];
       };

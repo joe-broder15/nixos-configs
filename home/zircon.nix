@@ -29,6 +29,9 @@
     proton-vpn
     keepassxc
     claude-code
+    adapta-kde-theme
+    kdePackages.qtstyleplugin-kvantum
+    zsh
     # # Adds the 'hello' command to your environment. It prints a friendly
     # # "Hello, world!" when run.
     # pkgs.hello
@@ -86,6 +89,65 @@
     enable = true;
     userName = "joe-broder15";
     userEmail = "joe.broder@proton.me";
+  };
+
+  programs.zsh = {
+    enable = true;
+    enableCompletion = true;
+    autosuggestion.enable = true;
+    syntaxHighlighting.enable = true;
+
+    shellAliases = {
+      ll = "ls -lah";
+      gs = "git status";
+      hms = "home-manager switch";
+    };
+
+    history = {
+      size = 10000;
+      save = 10000;
+      ignoreDups = true;
+      share = true; # share history across sessions
+    };
+
+    initExtra = ''
+      # anything that needs to go in .zshrc verbatim
+      bindkey -e  # emacs keybindings (or -v for vi)
+    '';
+  };
+
+  # If login shell is bash (non-nix systems), auto-launch zsh
+  programs.bash = {
+    enable = true;
+    bashrcExtra = ''
+      if [[ -z "$ZSH_VERSION" && $- == *i* ]]; then
+        exec zsh
+      fi
+    '';
+  };
+
+  programs.starship = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = {
+      add_newline = false;
+      format = "$directory$git_branch$git_status$character";
+
+      character = {
+        success_symbol = "[❯](bold green)";
+        error_symbol = "[❯](bold red)";
+      };
+
+      directory = {
+        truncation_length = 3;
+        truncate_to_repo = true;
+      };
+
+      git_branch = {
+        symbol = " ";
+        format = "[$symbol$branch]($style) ";
+      };
+    };
   };
 
   # Let Home Manager install and manage itself.

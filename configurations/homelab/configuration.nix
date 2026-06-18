@@ -2,7 +2,12 @@
 # your system.  Help is available in the configuration.nix(5) man page
 # and in the NixOS manual (accessible by running ‘nixos-help’).
 
-{ config, lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 {
   imports = [
@@ -135,7 +140,7 @@
       enable = true;
       enableWebUI = true; # To run the WebUI
       httpListenAddr = "127.0.0.1";
-      httpListenPort = 9999; 
+      httpListenPort = 9999;
       directoryRoot = "/resilio-shared-folders";
     };
 
