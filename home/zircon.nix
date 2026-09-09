@@ -25,6 +25,7 @@
     proton-vpn
     keepassxc
     claude-code
+    codex
     gh
     gnomeExtensions.dash-to-panel
     tree
