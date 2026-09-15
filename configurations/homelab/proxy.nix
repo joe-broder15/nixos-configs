@@ -26,6 +26,17 @@ let
   };
 in
 {
+  sops.secrets."namecheap_secrets/namecheap_api_user" = { };
+  sops.secrets."namecheap_secrets/namecheap_api_key" = { };
+
+  sops.templates."namecheap.env" = {
+    owner = "acme";
+    content = ''
+      NAMECHEAP_API_USER=${config.sops.placeholder."namecheap_secrets/namecheap_api_user"}
+      NAMECHEAP_API_KEY=${config.sops.placeholder."namecheap_secrets/namecheap_api_key"}
+    '';
+  };
+
   services.nginx.enable = true;
   services.nginx.recommendedProxySettings = true;
 
@@ -38,7 +49,7 @@ in
       domain = "*.${baseDomain}";
       extraDomainNames = [ baseDomain ]; # also cover apex
       dnsProvider = "namecheap"; # lego provider code
-      environmentFile = "/etc/nixos/namecheap.env";
+      environmentFile = config.sops.templates."namecheap.env".path;
 
       # Make the resulting cert readable by nginx
       group = config.services.nginx.group;
