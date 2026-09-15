@@ -25,6 +25,11 @@ in
               url = "https://plex.${baseDomain}";
             }
             {
+              name = "AnimeZ";
+              icon = "fas fa-tv";
+              url = "https://animez.to";
+            }
+            {
               name = "qBittorrent";
               logo = logo "qbittorrent";
               url = "https://qbittorrent.${baseDomain}";
