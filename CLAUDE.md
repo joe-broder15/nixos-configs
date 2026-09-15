@@ -33,7 +33,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad); imports shell.nix, gtk.nix, and alias.nix.
 ├── secrets/
-│   └── common.yaml                        # SOPS-encrypted shared secrets, currently containing the Synology CIFS credentials used by homelab and thinkpad.
+│   └── common.yaml                        # SOPS-encrypted shared secrets: Synology CIFS credentials (homelab and thinkpad) and Namecheap API credentials (homelab proxy.nix ACME DNS challenge).
 └── scripts/
     ├── pull-and-rebuild.sh                # Pulls latest changes and runs nixos-rebuild switch for a given configuration.
     ├── pull-and-rebuild-home.sh           # Pulls latest changes and runs home-manager switch for a given home configuration.
