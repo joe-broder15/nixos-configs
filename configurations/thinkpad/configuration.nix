@@ -1,7 +1,9 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
   imports = [
+    ../common/crypto.nix
+    ../common/synology.nix
     ./hosts.nix
   ];
 
@@ -36,16 +38,6 @@
 
   services.printing.enable = true;
 
-  services.openssh = {
-    generateHostKeys = true;
-    hostKeys = [
-      {
-        path = "/etc/ssh/ssh_host_ed25519_key";
-        type = "ed25519";
-      }
-    ];
-  };
-
   security.rtkit.enable = true;
   services.pulseaudio.enable = false;
   services.pipewire = {
@@ -77,7 +69,6 @@
     resilio-sync
     home-manager
     gnome-tweaks
-    cifs-utils
     age
     sops
   ];
@@ -100,25 +91,6 @@
     "nix-command"
     "flakes"
   ];
-
-  fileSystems."/mnt/Library1" = {
-    device = "//synology.local/Library1";
-    fsType = "cifs";
-    options =
-      let
-        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      in
-      [ "${automount_opts},credentials=${config.sops.templates."smb-secrets".path},uid=1000,gid=100" ];
-  };
-
-  sops.defaultSopsFile = ../../secrets/common.yaml;
-  sops.age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
-  sops.secrets."smb_secrets/synology_creds/username" = { };
-  sops.secrets."smb_secrets/synology_creds/password" = { };
-  sops.templates."smb-secrets".content = ''
-    username=${config.sops.placeholder."smb_secrets/synology_creds/username"}
-    password=${config.sops.placeholder."smb_secrets/synology_creds/password"}
-  '';
 
   # Do not change; tracks the NixOS release that initialized stateful data paths.
   system.stateVersion = "25.05";

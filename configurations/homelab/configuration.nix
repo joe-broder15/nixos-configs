@@ -6,6 +6,8 @@
 
 {
   imports = [
+    ../common/crypto.nix
+    ../common/synology.nix
     ./domain.nix
     ./proxy.nix
     ./homer.nix
@@ -25,7 +27,6 @@
   environment.systemPackages = with pkgs; [
     vim
     wget
-    cifs-utils
     qbittorrent
     wireguard-tools
     plex
@@ -80,12 +81,6 @@
 
     openssh = {
       enable = true;
-      hostKeys = [
-        {
-          path = "/etc/ssh/ssh_host_ed25519_key";
-          type = "ed25519";
-        }
-      ];
     };
 
     qbittorrent = {
@@ -181,16 +176,6 @@
       chmod 600 /var/lib/SillyTavern/config.yaml
     fi
   '';
-
-  fileSystems."/mnt/Library1" = {
-    device = "//192.168.1.99/Library1";
-    fsType = "cifs";
-    options =
-      let
-        automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
-      in
-      [ "${automount_opts},credentials=/etc/nixos/smb-secrets,uid=1000,gid=100" ];
-  };
 
   # Do not change; tracks the NixOS release that initialized stateful data paths.
   system.stateVersion = "25.05";
