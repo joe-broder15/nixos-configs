@@ -16,21 +16,24 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 ├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix; hardware config read from /etc/nixos/hardware-configuration.nix on the host.
 ├── flake.lock                             # Pinned input versions for the flake.
 ├── configurations/
+│   ├── common/
+│   │   ├── crypto.nix                     # Shared SOPS/Age setup: generates an Ed25519 SSH host key and sets it as the sops-nix Age identity.
+│   │   └── synology.nix                   # Shared CIFS mount for //synology.local/Library1, with credentials rendered by sops-nix.
 │   ├── homelab/
-│   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options (incl. Ollama + Open WebUI).
+│   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options (incl. Ollama + Open WebUI); imports ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials.
 │   │   ├── domain.nix                     # Defines the shared baseDomain module arg used by proxy.nix and homer.nix.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
 │   └── thinkpad/
-│       ├── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM, SOPS-managed CIFS credentials, and an automatically generated Ed25519 host key.
-│       └── hosts.nix                      # Static hosts-file entries for synology.local, proxmox.local, and homelab.local.
+│       ├── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials.
+│       └── hosts.nix                      # Static hosts-file entries for proxmox.local and homelab.local (synology.local comes from common/synology.nix).
 ├── home/
 │   ├── alias.nix                          # Shell aliases (ll, gs, help, update-sops-keys, hmr, hmp, home, syno) imported by zircon.nix.
-│   ├── gtk.nix                            # GTK theme (Dracula), icon theme (Papirus-Dark), and cursor theme (capitaine-cursors) config, imported by zircon.nix.
+│   ├── gtk.nix                            # GTK theme (Gruvbox Dark), icon theme (oomox-gruvbox-dark), and cursor theme (Capitaine Cursors, Gruvbox) config, imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad); imports shell.nix, gtk.nix, and alias.nix.
 ├── secrets/
-│   └── common.yaml                        # SOPS-encrypted shared secrets, currently containing the ThinkPad's Synology CIFS credentials.
+│   └── common.yaml                        # SOPS-encrypted shared secrets, currently containing the Synology CIFS credentials used by homelab and thinkpad.
 └── scripts/
     ├── pull-and-rebuild.sh                # Pulls latest changes and runs nixos-rebuild switch for a given configuration.
     ├── pull-and-rebuild-home.sh           # Pulls latest changes and runs home-manager switch for a given home configuration.
