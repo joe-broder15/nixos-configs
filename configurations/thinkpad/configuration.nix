@@ -5,6 +5,7 @@
     ../common/crypto.nix
     ../common/synology.nix
     ./hosts.nix
+    (import ../common/wireguard.nix { secretKey = "wireguard_secrets/thinkpad_proton_vpn_config"; })
   ];
 
   boot.loader.systemd-boot.enable = true;

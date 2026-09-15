@@ -11,6 +11,11 @@
     ./domain.nix
     ./proxy.nix
     ./homer.nix
+    (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })
+    (import ../common/wireguard.nix {
+      secretKey = "wireguard_secrets/homelab_proton_vpn_config";
+      natExternalInterface = "ens18";
+    })
   ];
 
   boot.loader.grub.enable = true;
@@ -28,14 +33,12 @@
     vim
     wget
     qbittorrent
-    wireguard-tools
     plex
     htop
     fastfetch
     git
     tree
     tmux
-    ddns-updater
     homer
     sillytavern
     resilio-sync
@@ -46,13 +49,6 @@
   networking = {
     hostName = "nixos";
     networkmanager.enable = true;
-    wg-quick.interfaces.wg0.configFile = "/etc/nixos/wireguard/wg0.conf";
-    nat = {
-      enable = true;
-      enableIPv6 = true;
-      externalInterface = "ens18";
-      internalInterfaces = [ "wg0" ];
-    };
   };
 
   time.timeZone = "America/Los_Angeles";
@@ -94,17 +90,6 @@
       enable = true;
       user = "user";
       openFirewall = true;
-    };
-
-    ddns-updater = {
-      enable = true;
-      environment = {
-        SERVER_ENABLED = "yes";
-        CONFIG_FILEPATH = "/etc/ddns-updater/config.json";
-        PERIOD = "1m";
-        LOG_LEVEL = "debug";
-        LISTENING_ADDRESS = ":8081";
-      };
     };
 
     sillytavern = {
