@@ -7,12 +7,15 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    sops-nix.url = "github:Mic92/sops-nix";
+    sops-nix.inputs.nixpkgs.follows = "nixpkgs";
   };
 
   outputs =
     {
       nixpkgs,
       home-manager,
+      sops-nix,
       ...
     }:
     let
@@ -28,6 +31,7 @@
         modules = [
           /etc/nixos/hardware-configuration.nix
           ./configurations/homelab/configuration.nix
+          sops-nix.nixosModules.sops
         ];
       };
 
@@ -41,7 +45,9 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.zircon = import ./home/zircon.nix;
+
           }
+          sops-nix.nixosModules.sops
         ];
       };
 

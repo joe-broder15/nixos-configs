@@ -11,8 +11,9 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 
 ```
 .
+├── .sops.yaml                             # SOPS creation rules and public Age recipients for encrypted files under secrets/.
 ├── README.md                              # Repo overview, supporting files, services, and workflow docs.
-├── flake.nix                              # Defines nixosConfigurations (homelab, thinkpad) and homeConfigurations (zircon); hardware config read from /etc/nixos/hardware-configuration.nix on the host.
+├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix; hardware config read from /etc/nixos/hardware-configuration.nix on the host.
 ├── flake.lock                             # Pinned input versions for the flake.
 ├── configurations/
 │   ├── homelab/
@@ -21,13 +22,15 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
 │   └── thinkpad/
-│       ├── configuration.nix              # ThinkPad T14 desktop configuration with GNOME/GDM; also mounts the Synology CIFS share.
-│       └── hosts.nix                      # Static hosts-file entry resolving synology.local, imported by configuration.nix.
+│       ├── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM, SOPS-managed CIFS credentials, and an automatically generated Ed25519 host key.
+│       └── hosts.nix                      # Static hosts-file entries for synology.local, proxmox.local, and homelab.local.
 ├── home/
-│   ├── alias.nix                          # Shell aliases (ll, gs, hmr, hmp, home, syno) imported by zircon.nix.
+│   ├── alias.nix                          # Shell aliases (ll, gs, help, update-sops-keys, hmr, hmp, home, syno) imported by zircon.nix.
 │   ├── gtk.nix                            # GTK theme (Dracula), icon theme (Papirus-Dark), and cursor theme (capitaine-cursors) config, imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad); imports shell.nix, gtk.nix, and alias.nix.
+├── secrets/
+│   └── common.yaml                        # SOPS-encrypted shared secrets, currently containing the ThinkPad's Synology CIFS credentials.
 └── scripts/
     ├── pull-and-rebuild.sh                # Pulls latest changes and runs nixos-rebuild switch for a given configuration.
     ├── pull-and-rebuild-home.sh           # Pulls latest changes and runs home-manager switch for a given home configuration.
@@ -37,7 +40,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 
 ## Agents
 
-- **autodoc** (`.claude/agents/autodoc.md`) — Keeps README.md and CLAUDE.md factually accurate after code changes. Updates file listings, path references, and one-line descriptions when files are added, removed, renamed, or repurposed. Does not restructure or redesign documentation — layout and prose decisions are left to humans. Invoke it after staging or committing changes that affect the file tree or a module's purpose.
+- **autodoc** (`.claude/agents/autodoc.md`) — Keeps README.md, CLAUDE.md, and the curated alias help listing factually accurate after code changes. Updates file listings, path references, one-line descriptions, and alias entries when files or aliases are added, removed, renamed, or repurposed. Does not restructure or redesign documentation — layout and prose decisions are left to humans. Invoke it after staging or committing changes that affect the file tree, aliases, or a module's purpose.
 
 ## Adding a new host
 

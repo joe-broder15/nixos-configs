@@ -29,6 +29,7 @@
     gh
     gnomeExtensions.dash-to-panel
     tree
+    fastfetch
   ];
 
   home.file = {
