@@ -4,5 +4,6 @@ result-*
 
 # Ignore automatically generated direnv output
 .direnv
+.sync
 
 hardware-configration.nix

@@ -4,6 +4,7 @@
   imports = [
     ../common/crypto.nix
     ../common/synology.nix
+    ../common/resilio.nix
     ./hosts.nix
     (import ../common/wireguard.nix { secretKey = "wireguard_secrets/thinkpad_proton_vpn_config"; })
   ];
@@ -67,25 +68,10 @@
     git
     wget
     zsh
-    resilio-sync
     home-manager
     gnome-tweaks
     age
     sops
-  ];
-
-  services.resilio = {
-    enable = true;
-    enableWebUI = true;
-    httpListenAddr = "127.0.0.1";
-    httpListenPort = 9999;
-    directoryRoot = "/resilio-shared-folders";
-  };
-
-  # rslsync creates this dir as 0755 by default; setgid + group-write lets the
-  # zircon user (in the rslsync group) read and write synced files directly.
-  systemd.tmpfiles.rules = [
-    "d /resilio-shared-folders 2775 rslsync rslsync - -"
   ];
 
   nix.settings.experimental-features = [

@@ -16,7 +16,7 @@
     cursorTheme = {
       name = "Capitaine Cursors (Gruvbox)";
       package = pkgs.capitaine-cursors-themed;
-      size = 24;
+      size = 32;
     };
 
     gtk3.extraConfig = {
