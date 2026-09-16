@@ -13,8 +13,9 @@ Opinionated NixOS configuration for the homelab server running on a Proxmox VM.
 
 ### thinkpad
 NixOS configuration for ThinkPad T14 laptop with GNOME desktop.
-- `configurations/thinkpad/configuration.nix` contains the desktop configuration; it imports the shared `configurations/common/crypto.nix` and `configurations/common/synology.nix` modules for a CIFS mount at `//synology.local/Library1` with credentials rendered by sops-nix, plus the shared `configurations/common/wireguard.nix` module (client-only, no NAT since thinkpad doesn't route other traffic through the tunnel).
+- `configurations/thinkpad/configuration.nix` contains the desktop configuration; it imports the shared `configurations/common/crypto.nix` and `configurations/common/synology.nix` modules for a CIFS mount at `//synology.local/Library1` with credentials rendered by sops-nix, the shared `configurations/common/resilio.nix` module for Resilio Sync, plus the shared `configurations/common/wireguard.nix` module (client-only, no NAT since thinkpad doesn't route other traffic through the tunnel).
 - `configurations/thinkpad/hosts.nix` adds static `networking.hosts` entries for `proxmox.local` and `homelab.local` (the `synology.local` entry is added by `configurations/common/synology.nix`).
+- `configurations/common/resilio.nix` is a web-UI-managed Resilio Sync component: it installs `pkgs.resilio-sync`, sources the license and WebUI credentials from sops-nix (the license is materialized as a `.btskey` file and applied via `ExecStartPre`), and creates `/resilio-shared-folders`. It lives under `configurations/common/` but is currently only imported by thinkpad; homelab keeps its own separate, non-sops-sourced Resilio Sync config.
 - Hardware configuration is read from `/etc/nixos/hardware-configuration.nix` on the host (not versioned in this repo).
 
 The `flake.nix` (repo root) exposes both configurations as `nixosConfigurations.homelab` and `nixosConfigurations.thinkpad` for flake-based rebuilds.
@@ -51,7 +52,7 @@ The WireGuard `wg0` config and the DDNS Updater config are no longer plain files
 
 Create or copy these files on the machine before rebuilding.
 
-The Synology CIFS credentials (shared by homelab and thinkpad via `configurations/common/synology.nix`), the Namecheap API credentials (used by `configurations/homelab/proxy.nix` for ACME DNS challenges), the per-host WireGuard `wg0` configs (used by the shared `configurations/common/wireguard.nix` module, imported separately by both homelab and thinkpad), and the DDNS Updater Namecheap account password (used by `configurations/common/namecheap-ddns-updater.nix`, imported only by homelab; domain and provider are no longer sops-sourced) are stored encrypted in `secrets/common.yaml` and rendered at activation time by sops-nix using `/etc/ssh/ssh_host_ed25519_key` as an Age identity (set up by `configurations/common/crypto.nix`). The host key is generated automatically when absent.
+The Synology CIFS credentials (shared by homelab and thinkpad via `configurations/common/synology.nix`), the Namecheap API credentials (used by `configurations/homelab/proxy.nix` for ACME DNS challenges), the per-host WireGuard `wg0` configs (used by the shared `configurations/common/wireguard.nix` module, imported separately by both homelab and thinkpad), the DDNS Updater Namecheap account password (used by `configurations/common/namecheap-ddns-updater.nix`, imported only by homelab; domain and provider are no longer sops-sourced), and Resilio Sync's license and WebUI credentials (used by `configurations/common/resilio.nix`, imported only by thinkpad) are stored encrypted in `secrets/common.yaml` and rendered at activation time by sops-nix using `/etc/ssh/ssh_host_ed25519_key` as an Age identity (set up by `configurations/common/crypto.nix`). The host key is generated automatically when absent.
 
 ## Services configured here
 

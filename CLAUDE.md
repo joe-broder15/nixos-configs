@@ -19,6 +19,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── common/
 │   │   ├── crypto.nix                     # Shared SOPS/Age setup: generates an Ed25519 SSH host key and sets it as the sops-nix Age identity.
 │   │   ├── namecheap-ddns-updater.nix      # DDNS Updater package and services.ddns-updater block: { domain }: { ... } takes domain as a parameter, hardcodes provider to "namecheap", and sources only the account password from sops-nix; imported only by homelab.
+│   │   ├── resilio.nix                    # Reusable resilio-sync component: web-UI-managed services.resilio, license and WebUI creds sourced from sops-nix, /resilio-shared-folders created via tmpfiles; imported only by thinkpad (homelab keeps its own separate, non-sops resilio config).
 │   │   ├── synology.nix                   # Shared CIFS mount for //synology.local/Library1, with credentials rendered by sops-nix.
 │   │   └── wireguard.nix                  # Reusable wg0 client component: { secretKey, natExternalInterface ? null }: owns wireguard-tools, its sops-nix secret, and networking.wg-quick config; adds networking.nat only when natExternalInterface is set.
 │   ├── homelab/
@@ -27,7 +28,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
 │   └── thinkpad/
-│       ├── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ./hosts.nix, and ../common/wireguard.nix (client-only, no NAT).
+│       ├── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ./hosts.nix, and ../common/wireguard.nix (client-only, no NAT).
 │       └── hosts.nix                      # Static hosts-file entries for proxmox.local and homelab.local (synology.local comes from common/synology.nix).
 ├── home/
 │   ├── alias.nix                          # Shell aliases (ll, gs, help, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop) imported by zircon.nix.
@@ -35,7 +36,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad); imports shell.nix, gtk.nix, and alias.nix.
 ├── secrets/
-│   └── common.yaml                        # SOPS-encrypted shared secrets: Synology CIFS credentials (homelab and thinkpad), Namecheap API credentials (homelab proxy.nix ACME DNS challenge), per-host WireGuard wg0 configs (thinkpad and homelab, common/wireguard.nix), and the DDNS Updater Namecheap account password (common/namecheap-ddns-updater.nix, used by homelab; domain and provider are no longer sops-sourced).
+│   └── common.yaml                        # SOPS-encrypted shared secrets: Synology CIFS credentials (homelab and thinkpad), Namecheap API credentials (homelab proxy.nix ACME DNS challenge), per-host WireGuard wg0 configs (thinkpad and homelab, common/wireguard.nix), the DDNS Updater Namecheap account password (common/namecheap-ddns-updater.nix, used by homelab; domain and provider are no longer sops-sourced), and Resilio Sync's license/WebUI credentials (common/resilio.nix, used by thinkpad).
 └── scripts/
     ├── pull-and-rebuild.sh                # Pulls latest changes and runs nixos-rebuild switch for a given configuration.
     ├── pull-and-rebuild-home.sh           # Pulls latest changes and runs home-manager switch for a given home configuration.
