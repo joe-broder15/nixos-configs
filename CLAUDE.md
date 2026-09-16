@@ -30,7 +30,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │       ├── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ./hosts.nix, and ../common/wireguard.nix (client-only, no NAT).
 │       └── hosts.nix                      # Static hosts-file entries for proxmox.local and homelab.local (synology.local comes from common/synology.nix).
 ├── home/
-│   ├── alias.nix                          # Shell aliases (ll, gs, help, update-sops-keys, hmr, hmp, home, syno) imported by zircon.nix.
+│   ├── alias.nix                          # Shell aliases (ll, gs, help, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop) imported by zircon.nix.
 │   ├── gtk.nix                            # GTK theme (Gruvbox Dark), icon theme (oomox-gruvbox-dark), and cursor theme (Capitaine Cursors, Gruvbox) config, imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad); imports shell.nix, gtk.nix, and alias.nix.
