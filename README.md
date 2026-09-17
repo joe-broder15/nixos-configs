@@ -66,7 +66,6 @@ The Synology CIFS credentials (shared by homelab and thinkpad via `configuration
 - qbittorrent headless client.
 - Plex Media Server.
 - Resilio Sync with WebUI and shared-folder root at `/resilio-shared-folders`.
-- SillyTavern web UI for LLM chat.
 - ClamAV daemon and on-demand scanner.
 - Ollama local LLM server (CPU-only, `pkgs.ollama-cpu`), listening on `0.0.0.0` with `deepseek-r1:1.5b` preloaded.
 - Open WebUI as a front-end for Ollama.
@@ -78,7 +77,6 @@ The Synology CIFS credentials (shared by homelab and thinkpad via `configuration
 - Homer: `https://homer.local.clubtropicalexcellent.vip`
 - Plex: `https://plex.local.clubtropicalexcellent.vip`
 - qBittorrent: `https://qbittorrent.local.clubtropicalexcellent.vip`
-- SillyTavern: `https://sillytavern.local.clubtropicalexcellent.vip`
 - Resilio Sync: `https://resilio.local.clubtropicalexcellent.vip`
 - DDNS Updater: `https://ddns.local.clubtropicalexcellent.vip`
 - Open WebUI: `https://openwebui.local.clubtropicalexcellent.vip`

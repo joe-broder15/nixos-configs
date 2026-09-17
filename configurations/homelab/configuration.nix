@@ -1,5 +1,4 @@
 {
-  lib,
   pkgs,
   ...
 }:
@@ -37,7 +36,6 @@
     tree
     tmux
     homer
-    sillytavern
     resilio-sync
     clamav
     age
@@ -48,8 +46,8 @@
       enable = true;
     };
 
-    # qbittorrent/plex/sillytavern all run as the single "user" account
-    # declared below, rather than each getting a dedicated service user.
+    # qbittorrent/plex all run as the single "user" account declared below,
+    # rather than each getting a dedicated service user.
     qbittorrent = {
       enable = true;
       openFirewall = true;
@@ -61,13 +59,6 @@
       enable = true;
       user = "user";
       openFirewall = true; # opens Plex's fixed default port (32400)
-    };
-
-    sillytavern = {
-      enable = true;
-      port = 8083; # must match proxy.nix's simplePorts.sillytavern
-      listen = true;
-      user = "user";
     };
 
     resilio = {
@@ -121,18 +112,4 @@
   systemd.tmpfiles.rules = [
     "d /resilio-shared-folders 0750 rslsync rslsync -"
   ];
-
-  # The upstream sillytavern module symlinks config.yaml into the read-only Nix
-  # store, which prevents SillyTavern from writing its own config at runtime.
-  # We clear that tmpfiles rule and replace any symlink with a writable copy on
-  # every service start.
-  systemd.tmpfiles.settings.sillytavern."/var/lib/SillyTavern/config.yaml" = lib.mkForce { };
-
-  systemd.services.sillytavern.preStart = ''
-    if [ -L /var/lib/SillyTavern/config.yaml ] || [ ! -e /var/lib/SillyTavern/config.yaml ]; then
-      rm -f /var/lib/SillyTavern/config.yaml
-      cp ${pkgs.sillytavern}/lib/node_modules/sillytavern/default/config.yaml /var/lib/SillyTavern/config.yaml
-      chmod 600 /var/lib/SillyTavern/config.yaml
-    fi
-  '';
 }

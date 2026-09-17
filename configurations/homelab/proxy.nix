@@ -20,7 +20,6 @@ let
   # Simple vhosts: just proxy to a local port, no extra nginx config needed.
   simplePorts = {
     plex = 32400; # Plex's fixed default port
-    sillytavern = 8083; # must match configuration.nix's services.sillytavern.port
     resilio = 9999; # must match configuration.nix's services.resilio.httpListenPort
     ddns = 8081; # common/namecheap-ddns-updater.nix's LISTENING_ADDRESS
   };

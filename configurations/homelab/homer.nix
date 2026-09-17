@@ -37,11 +37,6 @@ in
               url = "https://qbittorrent.${baseDomain}";
             }
             {
-              name = "SillyTavern";
-              logo = logo "sillytavern";
-              url = "https://sillytavern.${baseDomain}";
-            }
-            {
               name = "Resilio Sync";
               logo = logo "resiliosync";
               url = "https://resilio.${baseDomain}";
