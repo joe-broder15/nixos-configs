@@ -18,7 +18,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 ├── configurations/
 │   ├── common/
 │   │   ├── base.nix                       # Shared base NixOS settings: NetworkManager, timezone, locale/xkb, flakes enabled, unfree allowed, and the pinned stateVersion; imported by all three hosts (homelab, thinkpad, desktop).
-│   │   ├── crypto.nix                     # Shared SOPS/Age setup: generates an Ed25519 SSH host key and sets it as the sops-nix Age identity.
+│   │   ├── crypto.nix                     # Shared SOPS/Age setup: generates an Ed25519 SSH host key and sets it as the sops-nix Age identity; also installs age and sops system packages for manually inspecting/editing sops-encrypted files.
 │   │   ├── hosts.nix                      # Static hosts-file entries for proxmox.local and homelab.local (synology.local comes from common/synology.nix); imported by thinkpad and desktop.
 │   │   ├── logitech.nix                   # Enables hardware.bluetooth and hardware.logitech.wireless plus programs.solaar, so Solaar can manage Logitech peripherals (e.g. MX Master mouse, MX Keys keyboard) via Unifying receiver or Bluetooth; imported by thinkpad and desktop.
 │   │   ├── namecheap-ddns-updater.nix      # DDNS Updater package and services.ddns-updater block: { domain }: { ... } takes domain as a parameter, hardcodes provider to "namecheap", and sources only the account password from sops-nix; imported only by homelab.
@@ -35,10 +35,10 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   └── thinkpad/
 │       └── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, and ../common/wireguard.nix (client-only, no NAT).
 ├── home/
-│   ├── alias.nix                          # Shell aliases (ll, gs, help, host-age-pubkey, user-age-pubkey, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop) imported by zircon.nix.
+│   ├── alias.nix                          # Shell aliases (ll, gs, help, host-age-pubkey, user-age-pubkey, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop, icat) imported by zircon.nix.
 │   ├── gtk.nix                            # GTK theme (Gruvbox Dark), icon theme (oomox-gruvbox-dark), and cursor theme (Capitaine Cursors, Gruvbox) config, imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
-│   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad + desktop); imports shell.nix, gtk.nix, and alias.nix.
+│   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad + desktop); imports shell.nix, gtk.nix, and alias.nix; configures kitty as the terminal (programs.kitty: font, tab bar, pane-splitting keybindings).
 ├── secrets/
 │   └── common.yaml                        # SOPS-encrypted shared secrets: Synology CIFS credentials (homelab, thinkpad, and desktop), Namecheap API credentials (homelab proxy.nix ACME DNS challenge), per-host WireGuard wg0 configs (homelab, thinkpad, and desktop, common/wireguard.nix), the DDNS Updater Namecheap account password (common/namecheap-ddns-updater.nix, used by homelab; domain and provider are no longer sops-sourced), and Resilio Sync's license/WebUI credentials (common/resilio.nix, used by thinkpad and desktop).
 └── scripts/

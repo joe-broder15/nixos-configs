@@ -54,7 +54,5 @@
     zsh
     home-manager
     gnome-tweaks
-    age
-    sops
   ];
 }

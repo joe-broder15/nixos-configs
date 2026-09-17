@@ -40,7 +40,6 @@
     homer
     resilio-sync
     clamav
-    age
   ];
 
   services = {

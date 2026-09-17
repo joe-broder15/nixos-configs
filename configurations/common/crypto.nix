@@ -1,6 +1,13 @@
-{ ... }:
+{ pkgs, ... }:
 
 {
+  # For manually inspecting/editing sops-encrypted files; sops-nix itself
+  # decrypts secrets automatically at activation.
+  environment.systemPackages = with pkgs; [
+    age
+    sops
+  ];
+
   services.openssh = {
     enable = true;
     generateHostKeys = true;

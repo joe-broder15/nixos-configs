@@ -52,8 +52,5 @@
     zsh
     home-manager
     gnome-tweaks
-    # For manually inspecting/editing sops-encrypted files; sops-nix itself decrypts secrets automatically at activation.
-    age
-    sops
   ];
 }

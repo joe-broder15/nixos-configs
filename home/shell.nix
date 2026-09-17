@@ -78,7 +78,7 @@
       # Starship only shows the hostname over SSH by default; force it on so
       # it always renders (this config is shared across multiple hosts).
       hostname = {
-        format = "[@$hostname](bold green) ";
+        format = "[ 󰒋 $hostname](bold green) ";
         ssh_only = false;
         disabled = false;
       };
