@@ -47,7 +47,7 @@
       palette = "normal";
 
       palettes.normal = {
-        arrow = "#333533";
+        arrow = "#EDF2F4";
         os = "#16f4d0";
         os_admin = "#e4ff1a";
         directory = "#9ffff5";
