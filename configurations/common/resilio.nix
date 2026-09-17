@@ -65,11 +65,11 @@
       '')
       # Resilio's own convention (matching its GUI builds) is a license file
       # sitting directly in a root folder, not just a transient --license
-      # invocation, so place a real copy there too; mode 0440 (rather than the
-      # sops secret's 0400) so anyone in the rslsync group can actually check
-      # it. -C skips the rewrite when the license is unchanged, since this
+      # invocation, so place a real copy there too; mode 0666 (rather than the
+      # sops secret's 0400) so it's readable/writable regardless of user or
+      # group. -C skips the rewrite when the license is unchanged, since this
       # ExecStartPre step reruns on every service (re)start.
-      "${pkgs.coreutils}/bin/install -C -m 0440 ${btskeyPath} /resilio-shared-folders/license.btskey"
+      "${pkgs.coreutils}/bin/install -C -m 0666 ${btskeyPath} /resilio-shared-folders/license.btskey"
       "${lib.getExe pkgs.resilio-sync} --license ${btskeyPath} --config /run/rslsync/config.json"
     ];
 
