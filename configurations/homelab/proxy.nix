@@ -8,7 +8,7 @@
 let
   mkProxy = proxyPass: {
     forceSSL = true;
-    useACMEHost = baseDomain;
+    useACMEHost = baseDomain; # all vhosts share the one wildcard cert keyed by baseDomain below
     locations."/" = {
       inherit proxyPass;
       proxyWebsockets = true;
@@ -19,18 +19,20 @@ let
 
   # Simple vhosts: just proxy to a local port, no extra nginx config needed.
   simplePorts = {
-    plex = 32400;
-    sillytavern = 8083;
-    resilio = 9999;
-    ddns = 8081;
+    plex = 32400; # Plex's fixed default port
+    sillytavern = 8083; # must match configuration.nix's services.sillytavern.port
+    resilio = 9999; # must match configuration.nix's services.resilio.httpListenPort
+    ddns = 8081; # common/namecheap-ddns-updater.nix's LISTENING_ADDRESS
   };
 in
 {
+  # ACME DNS-01 challenge credentials — separate from the ddns-updater's own
+  # namecheap secret in common/namecheap-ddns-updater.nix (different purpose).
   sops.secrets."namecheap_secrets/namecheap_api_user" = { };
   sops.secrets."namecheap_secrets/namecheap_api_key" = { };
 
   sops.templates."namecheap.env" = {
-    owner = "acme";
+    owner = "acme"; # the acme service runs as its own user and needs to read this file
     content = ''
       NAMECHEAP_API_USER=${config.sops.placeholder."namecheap_secrets/namecheap_api_user"}
       NAMECHEAP_API_KEY=${config.sops.placeholder."namecheap_secrets/namecheap_api_key"}
@@ -59,6 +61,8 @@ in
   services.nginx.virtualHosts =
     lib.mapAttrs' (name: port: lib.nameValuePair "${name}.${baseDomain}" (localProxy port)) simplePorts
     // {
+      # homer.nix's services.homer module already creates this vhost's serving
+      # config (virtualHost.nginx.enable); this entry only adds TLS to it.
       "homer.${baseDomain}" = {
         useACMEHost = baseDomain;
         forceSSL = true;

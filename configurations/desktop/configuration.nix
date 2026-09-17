@@ -1,5 +1,8 @@
 { pkgs, ... }:
 
+# Same desktop-class profile as ../thinkpad/configuration.nix (GNOME desktop,
+# Resilio Sync, Synology mount), for a separate physical machine — only the
+# WireGuard secret differs.
 {
   imports = [
     ../common/base.nix
@@ -7,8 +10,7 @@
     ../common/synology.nix
     ../common/resilio.nix
     ../common/hosts.nix
-    # No natExternalInterface: this laptop is only ever a wg0 client, never a gateway for other hosts.
-    (import ../common/wireguard.nix { secretKey = "wireguard_secrets/thinkpad_proton_vpn_config"; })
+    (import ../common/wireguard.nix { secretKey = "wireguard_secrets/desktop_proton_vpn_config"; })
   ];
 
   boot.loader.systemd-boot.enable = true;
@@ -47,7 +49,6 @@
     zsh
     home-manager
     gnome-tweaks
-    # For manually inspecting/editing sops-encrypted files; sops-nix itself decrypts secrets automatically at activation.
     age
     sops
   ];

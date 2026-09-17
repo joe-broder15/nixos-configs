@@ -27,10 +27,15 @@
   services.ddns-updater = {
     enable = true;
     environment = {
+      # Exposes the status web UI, which is what homelab/proxy.nix and
+      # homer.nix link to.
       SERVER_ENABLED = "yes";
       CONFIG_FILEPATH = config.sops.templates."ddns-updater-config".path;
       PERIOD = "1m";
+      # Left verbose since this service is low-traffic and mainly useful when
+      # DNS updates silently fail.
       LOG_LEVEL = "debug";
+      # Port 8081 is referenced directly by homelab/proxy.nix's reverse proxy.
       LISTENING_ADDRESS = ":8081";
     };
   };

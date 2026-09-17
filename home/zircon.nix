@@ -7,6 +7,8 @@
     ./alias.nix
   ];
 
+  # Set explicitly (not mkDefault) so standalone `home-manager switch --flake .#zircon`
+  # works; the thinkpad NixOS module sets the same values via mkDefault to avoid conflict.
   home.username = "zircon";
   home.homeDirectory = "/home/zircon";
 
@@ -88,7 +90,9 @@
   home.activation.generateSopsAgeKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     KEY_FILE="$HOME/.config/sops/age/keys.txt"
     if [ ! -f "$KEY_FILE" ]; then
+      # $DRY_RUN_CMD is a Home Manager convention: it no-ops under `--dry-run`.
       $DRY_RUN_CMD mkdir -p "$(dirname "$KEY_FILE")"
+      # Full store path since activation scripts run with a minimal PATH.
       $DRY_RUN_CMD ${pkgs.age}/bin/age-keygen -o "$KEY_FILE"
       $DRY_RUN_CMD chmod 600 "$KEY_FILE"
     fi

@@ -15,11 +15,15 @@
 {
   environment.systemPackages = [ pkgs.wireguard-tools ];
 
+  # The decrypted secret is a whole wg-quick config file (private key
+  # included), passed straight through as configFile below.
   sops.secrets.${secretKey} = { };
 
   networking = {
     wg-quick.interfaces.wg0.configFile = config.sops.secrets.${secretKey}.path;
   }
+  # Only present when the caller sets natExternalInterface; enables IP
+  # forwarding and masquerading so other hosts' traffic can exit via wg0.
   // lib.optionalAttrs (natExternalInterface != null) {
     nat = {
       enable = true;

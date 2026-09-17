@@ -37,6 +37,8 @@
   services.resilio = {
     enable = true;
     enableWebUI = true;
+    # Localhost-only; reach the WebUI via an SSH tunnel rather than exposing
+    # it on the LAN.
     httpListenAddr = "127.0.0.1";
     httpListenPort = 9000;
     directoryRoot = "/resilio-shared-folders";
@@ -72,9 +74,15 @@
     ];
 
   # rslsync creates this dir as 0755 by default; setgid + group-write lets a
-  # user in the rslsync group read and write synced files directly. Hosts that
-  # import this module should add their interactive user to the rslsync group.
+  # user in the rslsync group read and write synced files directly.
   systemd.tmpfiles.rules = [
     "d /resilio-shared-folders 2775 rslsync rslsync - -"
   ];
+
+  # Every interactive (isNormalUser) account gets read/write access to
+  # /resilio-shared-folders automatically, instead of each host manually
+  # listing "rslsync" in its users.users.<name>.extraGroups.
+  users.groups.rslsync.members = lib.attrNames (
+    lib.filterAttrs (_: u: u.isNormalUser) config.users.users
+  );
 }

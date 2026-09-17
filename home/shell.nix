@@ -65,6 +65,8 @@
         text_light = "#26272A";
       };
 
+      # Starship hides the username segment by default (only shows for root/SSH);
+      # force it on so it always renders.
       username = {
         style_user = "bold os";
         style_root = "bold os_admin";
@@ -73,6 +75,7 @@
         show_always = true;
       };
 
+      # The os module is disabled by default in starship; opt in explicitly.
       os = {
         format = "on [($name)]($style) ";
         style = "bold blue";
@@ -144,12 +147,14 @@
 
       package.disabled = true;
 
+      # Only takes effect if $fill appears in `format` above; it currently doesn't.
       fill.symbol = " ";
 
       nodejs = {
         format = "[ $symbol$version ]($style)";
         style = "bg:node fg:text_light";
         symbol = " ";
+        # Show the bare version string; starship's default prepends a "v".
         version_format = "\${raw}";
         disabled = false;
       };

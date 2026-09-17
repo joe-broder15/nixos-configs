@@ -1,6 +1,7 @@
-{ baseDomain, ... }:
+{ baseDomain, ... }: # supplied by domain.nix's _module.args, shared with proxy.nix
 
 let
+  # Pulls icons from an external CDN at render time — no local asset caching.
   logo = name: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/${name}.png";
 in
 {
@@ -8,7 +9,7 @@ in
     enable = true;
     virtualHost = {
       domain = "homer.${baseDomain}";
-      nginx.enable = true;
+      nginx.enable = true; # generates the vhost's serving config; proxy.nix only layers TLS on top
     };
     settings = {
       title = "Club Tropical Excellent";
@@ -25,6 +26,7 @@ in
               url = "https://plex.${baseDomain}";
             }
             {
+              # External site, not self-hosted/proxied — hence icon instead of logo.
               name = "AnimeZ";
               icon = "fas fa-tv";
               url = "https://animez.to";
@@ -55,11 +57,13 @@ in
               url = "https://openwebui.${baseDomain}";
             }
             {
+              # proxy.nix reverse-proxies this to Proxmox's actual host at 192.168.1.100.
               name = "Proxmox";
               logo = logo "proxmox";
               url = "https://proxmox.${baseDomain}";
             }
             {
+              # Plain LAN IP, not proxied — router's own UI handles its own TLS/auth.
               name = "Router";
               logo = logo "router";
               url = "http://192.168.1.1";

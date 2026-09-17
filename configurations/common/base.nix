@@ -1,4 +1,6 @@
 {
+  # Not overridden per-host, so both homelab and thinkpad end up with this
+  # literal hostname.
   networking.hostName = "nixos";
   networking.networkmanager.enable = true;
 
@@ -22,11 +24,13 @@
     variant = "";
   };
 
+  # Required since this repo's configs are consumed as flake outputs.
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"
   ];
 
+  # Needed for unfree packages like resilio-sync (common/resilio.nix).
   nixpkgs.config.allowUnfree = true;
 
   # Do not change; tracks the NixOS release that initialized stateful data paths.
