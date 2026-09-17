@@ -21,9 +21,9 @@
     # an actual *.btskey file, so materialize it as one instead.
     path = "/run/secrets/resilio_secrets/license.btskey";
   };
-  # Kept around (decrypted, rslsync-owned) even though nothing here consumes
-  # it directly: with the web UI enabled, the keepass shared folder has to be
-  # re-added by hand through it, and this is the read/write key to paste in.
+  # With the web UI enabled, the keepass shared folder has to be re-added by
+  # hand through it, and this is the read/write key to paste in; also
+  # materialized into /resilio-shared-folders below so it's easy to grab.
   sops.secrets."resilio_secrets/shared_folder_keepass_rw_key" = {
     owner = "rslsync";
   };
@@ -53,6 +53,7 @@
   systemd.services.resilio.serviceConfig.ExecStartPre =
     let
       btskeyPath = config.sops.secrets."resilio_secrets/btskey".path;
+      keepassRwKeyPath = config.sops.secrets."resilio_secrets/shared_folder_keepass_rw_key".path;
     in
     lib.mkAfter [
       (pkgs.writeShellScript "resilio-inject-webui-creds" ''
@@ -70,6 +71,9 @@
       # group. -C skips the rewrite when the license is unchanged, since this
       # ExecStartPre step reruns on every service (re)start.
       "${pkgs.coreutils}/bin/install -C -m 0666 ${btskeyPath} /resilio-shared-folders/license.btskey"
+      # Same rationale/mode as the license above: a plain copy in the shared
+      # folder is easier to grab than digging through /run/secrets.
+      "${pkgs.coreutils}/bin/install -C -m 0666 ${keepassRwKeyPath} /resilio-shared-folders/keepass_rw_key"
       "${lib.getExe pkgs.resilio-sync} --license ${btskeyPath} --config /run/rslsync/config.json"
     ];
 
