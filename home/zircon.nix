@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 
 {
   imports = [
@@ -30,6 +30,7 @@
     gnomeExtensions.dash-to-panel
     tree
     fastfetch
+    gparted
   ];
 
   home.file = {
@@ -81,4 +82,15 @@
   };
 
   programs.home-manager.enable = true;
+
+  # Bootstrap a personal sops-nix admin AGE key on first activation, mirroring
+  # how configurations/common/crypto.nix auto-generates the host SSH key.
+  home.activation.generateSopsAgeKey = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    KEY_FILE="$HOME/.config/sops/age/keys.txt"
+    if [ ! -f "$KEY_FILE" ]; then
+      $DRY_RUN_CMD mkdir -p "$(dirname "$KEY_FILE")"
+      $DRY_RUN_CMD ${pkgs.age}/bin/age-keygen -o "$KEY_FILE"
+      $DRY_RUN_CMD chmod 600 "$KEY_FILE"
+    fi
+  '';
 }

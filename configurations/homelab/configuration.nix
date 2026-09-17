@@ -6,6 +6,7 @@
 
 {
   imports = [
+    ../common/base.nix
     ../common/crypto.nix
     ../common/synology.nix
     ./domain.nix
@@ -21,13 +22,6 @@
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
-  nixpkgs.config.allowUnfree = true;
 
   environment.systemPackages = with pkgs; [
     vim
@@ -46,35 +40,7 @@
     age
   ];
 
-  networking = {
-    hostName = "nixos";
-    networkmanager.enable = true;
-  };
-
-  time.timeZone = "America/Los_Angeles";
-
-  i18n.defaultLocale = "en_US.UTF-8";
-
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
-
   services = {
-    xserver = {
-      xkb = {
-        layout = "us";
-        variant = "";
-      };
-    };
-
     openssh = {
       enable = true;
     };
@@ -161,7 +127,4 @@
       chmod 600 /var/lib/SillyTavern/config.yaml
     fi
   '';
-
-  # Do not change; tracks the NixOS release that initialized stateful data paths.
-  system.stateVersion = "25.05";
 }
