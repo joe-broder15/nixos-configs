@@ -33,6 +33,8 @@
     tree
     fastfetch
     gparted
+    htop
+    solaar
   ];
 
   home.file = {
@@ -57,9 +59,24 @@
   };
 
   # GNOME extensions installed via home.packages must be explicitly enabled by UUID.
-  dconf.settings."org/gnome/shell".enabled-extensions = [
-    pkgs.gnomeExtensions.dash-to-panel.extensionUuid
-  ];
+  # Dash to Panel reads its pinned/favorite apps from the same favorite-apps key
+  # GNOME Shell's default dash uses, rather than a separate setting of its own.
+  dconf.settings."org/gnome/shell" = {
+    enabled-extensions = [
+      pkgs.gnomeExtensions.dash-to-panel.extensionUuid
+    ];
+    favorite-apps = [
+      "brave-browser.desktop"
+      "terminator.desktop"
+      "code.desktop"
+      "org.gnome.Nautilus.desktop"
+      "discord.desktop"
+      "proton-mail.desktop"
+      "signal.desktop"
+      "org.keepassxc.KeePassXC.desktop"
+      "steam.desktop"
+    ];
+  };
 
   # Match the terminal font configured for Terminator (see home.file above).
   # terminal.integrated.fontFamily is parsed as CSS font-family, where an
@@ -73,6 +90,15 @@
       "terminal.integrated.fontFamily" = "'GohuFont 11 Nerd Font Mono'";
       "terminal.integrated.fontSize" = 12;
     };
+    profiles.default.extensions = with pkgs.vscode-extensions; [
+      rust-lang.rust-analyzer
+      golang.go
+      jnoortheen.nix-ide
+      ms-python.python
+      usernamehw.errorlens
+      eamodio.gitlens
+      johnpapa.vscode-peacock
+    ];
   };
 
   programs.git = {
