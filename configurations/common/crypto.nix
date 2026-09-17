@@ -2,6 +2,7 @@
 
 {
   services.openssh = {
+    enable = true;
     generateHostKeys = true;
     # Only this key is generated (not the usual rsa+ed25519 pair), since it
     # doubles as the host's sops-nix Age identity below.
