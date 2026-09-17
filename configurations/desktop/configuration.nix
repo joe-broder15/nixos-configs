@@ -10,6 +10,7 @@
     ../common/synology.nix
     ../common/resilio.nix
     ../common/hosts.nix
+    ../common/logitech.nix
     (import ../common/wireguard.nix { secretKey = "wireguard_secrets/desktop_proton_vpn_config"; })
   ];
 
