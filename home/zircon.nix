@@ -20,6 +20,7 @@
     tmux
     brave
     terminator
+    ghostty
     nerd-fonts.gohufont
     discord
     signal-desktop
@@ -56,6 +57,12 @@
             parent = window0
       [plugins]
     '';
+
+    # GohuFont is a bitmap font; point size must be 11 or 14.
+    ".config/ghostty/config".text = ''
+      font-family = GohuFont 11 Nerd Font Mono
+      font-size = 11
+    '';
   };
 
   # GNOME extensions installed via home.packages must be explicitly enabled by UUID.
@@ -67,7 +74,7 @@
     ];
     favorite-apps = [
       "brave-browser.desktop"
-      "terminator.desktop"
+      "com.mitchellh.ghostty.desktop"
       "code.desktop"
       "org.gnome.Nautilus.desktop"
       "discord.desktop"
