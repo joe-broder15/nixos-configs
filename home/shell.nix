@@ -39,7 +39,7 @@
     enableZshIntegration = true;
     settings = {
       format = ''
-        [╭╴](fg:arrow)$username$hostname$os$git_branch$git_status(at $directory)$cmd_duration$time(via $python$conda$nodejs$c$rust$java$docker_context)
+        [╭╴](fg:arrow)$username$hostname$os$git_branch$git_status (at $directory)$cmd_duration$time(via $python$conda$nodejs$c$rust$java$docker_context)
         [╰─](fg:arrow)$character'';
 
       add_newline = true;
@@ -78,7 +78,7 @@
       # Starship only shows the hostname over SSH by default; force it on so
       # it always renders (this config is shared across multiple hosts).
       hostname = {
-        format = "[@$hostname](bold os) ";
+        format = "[@$hostname](bold green) ";
         ssh_only = false;
         disabled = false;
       };

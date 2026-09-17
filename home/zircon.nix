@@ -61,7 +61,7 @@
     # GohuFont is a bitmap font; point size must be 11 or 14.
     ".config/ghostty/config".text = ''
       font-family = GohuFont 11 Nerd Font Mono
-      font-size = 11
+      font-size = 12
     '';
   };
 
