@@ -1,7 +1,5 @@
 {
-  # Not overridden per-host, so both homelab and thinkpad end up with this
-  # literal hostname.
-  networking.hostName = "nixos";
+  # networking.hostName is set per-host in each configuration.nix.
   networking.networkmanager.enable = true;
 
   time.timeZone = "America/Los_Angeles";

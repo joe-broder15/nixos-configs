@@ -39,7 +39,7 @@
     enableZshIntegration = true;
     settings = {
       format = ''
-        [╭╴](fg:arrow)$username$os$git_branch$git_status(at $directory)$cmd_duration$time(via $python$conda$nodejs$c$rust$java$docker_context)
+        [╭╴](fg:arrow)$username$hostname$os$git_branch$git_status(at $directory)$cmd_duration$time(via $python$conda$nodejs$c$rust$java$docker_context)
         [╰─](fg:arrow)$character'';
 
       add_newline = true;
@@ -70,9 +70,17 @@
       username = {
         style_user = "bold os";
         style_root = "bold os_admin";
-        format = "[  $user](fg:$style) ";
+        format = "[  $user](fg:$style)";
         disabled = false;
         show_always = true;
+      };
+
+      # Starship only shows the hostname over SSH by default; force it on so
+      # it always renders (this config is shared across multiple hosts).
+      hostname = {
+        format = "[@$hostname](bold os) ";
+        ssh_only = false;
+        disabled = false;
       };
 
       # The os module is disabled by default in starship; opt in explicitly.

@@ -11,6 +11,8 @@
     (import ../common/wireguard.nix { secretKey = "wireguard_secrets/thinkpad_proton_vpn_config"; })
   ];
 
+  networking.hostName = "thinkpad-nixos";
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 

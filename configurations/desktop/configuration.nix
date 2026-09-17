@@ -13,6 +13,8 @@
     (import ../common/wireguard.nix { secretKey = "wireguard_secrets/desktop_proton_vpn_config"; })
   ];
 
+  networking.hostName = "desktop-nixos";
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
 

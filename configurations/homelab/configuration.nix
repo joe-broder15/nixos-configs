@@ -21,6 +21,8 @@
     })
   ];
 
+  networking.hostName = "homelab-nixos";
+
   boot.loader.grub.enable = true;
   boot.loader.grub.device = "/dev/sda"; # this host's boot disk
   boot.loader.grub.useOSProber = true;
