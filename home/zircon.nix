@@ -35,6 +35,7 @@
     gparted
     htop
     solaar
+    emacs
   ];
 
   home.file = {
@@ -154,6 +155,15 @@
       # Full store path since activation scripts run with a minimal PATH.
       $DRY_RUN_CMD ${pkgs.age}/bin/age-keygen -o "$KEY_FILE"
       $DRY_RUN_CMD chmod 600 "$KEY_FILE"
+    fi
+  '';
+
+  # Clone spacemacs on first activation only; never touches an existing
+  # ~/.emacs.d so it won't clobber local edits or block re-activation.
+  home.activation.installSpacemacs = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    EMACS_DIR="$HOME/.emacs.d"
+    if [ ! -d "$EMACS_DIR" ]; then
+      $DRY_RUN_CMD ${pkgs.git}/bin/git clone -b develop https://github.com/syl20bnr/spacemacs "$EMACS_DIR"
     fi
   '';
 }
