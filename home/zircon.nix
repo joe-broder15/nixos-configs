@@ -142,6 +142,7 @@
       "ctrl+shift+r" = "start_resizing_window";
       # Overlays a number on every pane in the tab; press it to jump focus there.
       "ctrl+shift+p" = "focus_visible_window";
+      "ctrl+shift+space" = "command_palette";
     };
   };
 

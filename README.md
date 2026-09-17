@@ -20,8 +20,8 @@ NixOS configuration for ThinkPad T14 laptop with GNOME desktop.
 - Hardware configuration is read from `/etc/nixos/hardware-configuration.nix` on the host (not versioned in this repo).
 
 ### desktop
-NixOS configuration for a desktop-class machine with GNOME desktop, using the same profile as thinkpad.
-- `configurations/desktop/configuration.nix` contains the desktop configuration; it imports the same shared modules as thinkpad — `configurations/common/base.nix`, `configurations/common/crypto.nix` and `configurations/common/synology.nix` for the CIFS mount, `configurations/common/resilio.nix` for Resilio Sync, `configurations/common/hosts.nix`, and `configurations/common/logitech.nix` — plus its own `configurations/common/wireguard.nix` instance (client-only, no NAT, using a WireGuard secret separate from thinkpad's).
+NixOS configuration for a desktop-class machine with GNOME desktop, using the same profile as thinkpad, plus an NVIDIA GPU.
+- `configurations/desktop/configuration.nix` contains the desktop configuration; it imports the same shared modules as thinkpad — `configurations/common/base.nix`, `configurations/common/crypto.nix` and `configurations/common/synology.nix` for the CIFS mount, `configurations/common/resilio.nix` for Resilio Sync, `configurations/common/hosts.nix`, and `configurations/common/logitech.nix` — plus its own `configurations/common/wireguard.nix` instance (client-only, no NAT, using a WireGuard secret separate from thinkpad's). It additionally configures an NVIDIA RTX 2080 Super via `services.xserver.videoDrivers`, `hardware.graphics.enable`, and a `hardware.nvidia` block (proprietary driver, `open = false`).
 - Hardware configuration is read from `/etc/nixos/hardware-configuration.nix` on the host (not versioned in this repo).
 
 The `flake.nix` (repo root) exposes all three configurations as `nixosConfigurations.homelab`, `nixosConfigurations.thinkpad`, and `nixosConfigurations.desktop` for flake-based rebuilds.
