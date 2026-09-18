@@ -12,6 +12,10 @@
     sops-nix.url = "github:Mic92/sops-nix";
     # Same reasoning as above: avoid a second, independent nixpkgs evaluation.
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    noctalia = {
+      url = "github:noctalia-dev/noctalia";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -19,6 +23,7 @@
       nixpkgs,
       home-manager,
       sops-nix,
+      noctalia,
       ...
     }:
     let
@@ -55,7 +60,13 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.zircon = import ./home/zircon.nix;
+            home-manager.extraSpecialArgs = { inherit noctalia; };
+            home-manager.users.zircon = {
+              imports = [
+                ./home/zircon.nix
+                ./home/noctalia.nix
+              ];
+            };
           }
           sops-nix.nixosModules.sops
         ];
@@ -71,7 +82,13 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
-            home-manager.users.zircon = import ./home/zircon.nix;
+            home-manager.extraSpecialArgs = { inherit noctalia; };
+            home-manager.users.zircon = {
+              imports = [
+                ./home/zircon.nix
+                ./home/noctalia.nix
+              ];
+            };
           }
           sops-nix.nixosModules.sops
         ];
