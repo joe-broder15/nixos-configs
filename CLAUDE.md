@@ -36,7 +36,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │       └── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, and ../common/wireguard.nix (client-only, no NAT).
 ├── home/
 │   ├── alias.nix                          # Shell aliases (ll, gs, help, host-age-pubkey, user-age-pubkey, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop, icat, kdiff, palette) imported by zircon.nix.
-│   ├── gtk.nix                            # GTK theme (Gruvbox Dark), icon theme (oomox-gruvbox-dark), and cursor theme (Capitaine Cursors, Gruvbox) config, imported by zircon.nix.
+│   ├── gtk.nix                            # GTK theme (Dracula, via pkgs.dracula-theme, incl. gtk4), icon theme (vanilla Papirus-Dark), and cursor theme (Dracula-cursors, bundled in pkgs.dracula-theme) config, imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad + desktop); imports shell.nix, gtk.nix, and alias.nix; configures kitty as the terminal (programs.kitty: font, tab bar, pane-splitting keybindings, command_palette keybinding); bootstraps Spacemacs into ~/.emacs.d on first activation (home.activation.installSpacemacs) alongside the emacs package.
 ├── secrets/

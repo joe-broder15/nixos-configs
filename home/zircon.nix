@@ -90,6 +90,9 @@
     profiles.default.userSettings = {
       "terminal.integrated.fontFamily" = "'GohuFont 11 Nerd Font Mono'";
       "terminal.integrated.fontSize" = 12;
+      # Must match the "label" in the dracula-theme extension's package.json,
+      # not just "Dracula".
+      "workbench.colorTheme" = "Dracula Theme";
     };
     profiles.default.extensions = with pkgs.vscode-extensions; [
       rust-lang.rust-analyzer
@@ -99,6 +102,7 @@
       usernamehw.errorlens
       eamodio.gitlens
       johnpapa.vscode-peacock
+      dracula-theme.theme-dracula
     ];
   };
 
@@ -115,6 +119,7 @@
   # GohuFont is a bitmap font; point size must be 11 or 14.
   programs.kitty = {
     enable = true;
+    themeFile = "Dracula";
     settings = {
       font_family = "GohuFont 11 Nerd Font Mono";
       font_size = 11;

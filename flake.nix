@@ -56,7 +56,6 @@
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
             home-manager.users.zircon = import ./home/zircon.nix;
-
           }
           sops-nix.nixosModules.sops
         ];

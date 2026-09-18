@@ -46,23 +46,25 @@
 
       palette = "normal";
 
+      # Colors are Dracula's official palette (https://draculatheme.com);
+      # only 8 accents exist so several roles intentionally share a color.
       palettes.normal = {
-        arrow = "#EDF2F4";
-        os = "#16f4d0";
-        os_admin = "#e4ff1a";
-        directory = "#9ffff5";
-        time = "#bdfffd";
-        node = "#a5e6ba";
-        git = "#f17f29";
-        git_status = "#DFEBED";
-        python = "#edf67d";
-        conda = "#70e000";
-        java = "#F86279";
-        rust = "#ffdac6";
-        clang = "#caf0f8";
-        duration = "#ce4257";
-        text_color = "#EDF2F4";
-        text_light = "#26272A";
+        arrow = "#f8f8f2"; # foreground
+        os = "#8be9fd"; # cyan
+        os_admin = "#f1fa8c"; # yellow
+        directory = "#bd93f9"; # purple
+        time = "#6272a4"; # comment
+        node = "#50fa7b"; # green
+        git = "#ffb86c"; # orange
+        git_status = "#6272a4"; # comment
+        python = "#f1fa8c"; # yellow
+        conda = "#50fa7b"; # green
+        java = "#ff79c6"; # pink
+        rust = "#ffb86c"; # orange
+        clang = "#8be9fd"; # cyan
+        duration = "#ff5555"; # red
+        text_color = "#f8f8f2"; # foreground
+        text_light = "#282a36"; # background
       };
 
       # Starship hides the username segment by default (only shows for root/SSH);
