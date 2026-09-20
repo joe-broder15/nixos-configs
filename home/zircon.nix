@@ -5,6 +5,9 @@
     ./shell.nix
     ./gtk.nix
     ./alias.nix
+    ./kitty.nix
+    ./terminator.nix
+    ./vscode.nix
   ];
 
   # Set explicitly (not mkDefault) so standalone `home-manager switch --flake .#zircon`
@@ -19,7 +22,6 @@
     spotify
     tmux
     brave
-    terminator
     nerd-fonts.gohufont
     discord
     signal-desktop
@@ -37,27 +39,6 @@
     solaar
     emacs
   ];
-
-  home.file = {
-    # GohuFont is a bitmap font; point size must be 11 or 14.
-    ".config/terminator/config".text = ''
-      [global_config]
-      [keybindings]
-      [profiles]
-        [[default]]
-          use_system_font = False
-          font = GohuFont 11 Nerd Font Mono 11
-      [layouts]
-        [[default]]
-          [[[window0]]]
-            type = Window
-            parent = ""
-          [[[child1]]]
-            type = Terminal
-            parent = window0
-      [plugins]
-    '';
-  };
 
   # GNOME extensions installed via home.packages must be explicitly enabled by UUID.
   # Dash to Panel reads its pinned/favorite apps from the same favorite-apps key
@@ -79,33 +60,6 @@
     ];
   };
 
-  # Match the terminal font configured for Terminator (see home.file above).
-  # terminal.integrated.fontFamily is parsed as CSS font-family, where an
-  # unquoted identifier can't contain whitespace or digits; since the family
-  # name here has both, it must be single-quoted or VS Code silently falls
-  # back to its default terminal font instead of erroring.
-  programs.vscode = {
-    enable = true;
-    package = pkgs.vscode;
-    profiles.default.userSettings = {
-      "terminal.integrated.fontFamily" = "'GohuFont 11 Nerd Font Mono'";
-      "terminal.integrated.fontSize" = 12;
-      # Must match the "label" in the dracula-theme extension's package.json,
-      # not just "Dracula".
-      "workbench.colorTheme" = "Dracula Theme";
-    };
-    profiles.default.extensions = with pkgs.vscode-extensions; [
-      rust-lang.rust-analyzer
-      golang.go
-      jnoortheen.nix-ide
-      ms-python.python
-      usernamehw.errorlens
-      eamodio.gitlens
-      johnpapa.vscode-peacock
-      dracula-theme.theme-dracula
-    ];
-  };
-
   programs.git = {
     enable = true;
     settings.user = {
@@ -115,41 +69,6 @@
   };
 
   programs.home-manager.enable = true;
-
-  # GohuFont is a bitmap font; point size must be 11 or 14.
-  programs.kitty = {
-    enable = true;
-    themeFile = "Dracula";
-    settings = {
-      font_family = "GohuFont 11 Nerd Font Mono";
-      font_size = 11;
-      tab_bar_style = "powerline";
-      tab_powerline_style = "angled";
-      cursor_shape = "beam";
-      # "splits" first so new tabs start in split mode; the rest stay available via next_layout.
-      enabled_layouts = "splits,tall,fat,grid,stack";
-      # Digits only (instead of kitty's default letter+digit mix) for the focus_visible_window overlay below.
-      visual_window_select_characters = "1234567890";
-      # Draw a full border around every pane instead of just the shared edge between them.
-      draw_minimal_borders = "no";
-      window_margin_width = "2";
-      window_border_width = "1pt";
-    };
-    # Pane splitting/navigation for kitty's own "splits" layout; works regardless of
-    # window manager since it's kitty dividing its own OS window, not OS-level tiling.
-    keybindings = {
-      "ctrl+shift+enter" = "launch --location=hsplit --cwd=current";
-      "ctrl+shift+backslash" = "launch --location=vsplit --cwd=current";
-      "ctrl+shift+h" = "neighboring_window left";
-      "ctrl+shift+l" = "neighboring_window right";
-      "ctrl+shift+k" = "neighboring_window up";
-      "ctrl+shift+j" = "neighboring_window down";
-      "ctrl+shift+r" = "start_resizing_window";
-      # Overlays a number on every pane in the tab; press it to jump focus there.
-      "ctrl+shift+p" = "focus_visible_window";
-      "ctrl+shift+space" = "command_palette";
-    };
-  };
 
   # Bootstrap a personal sops-nix admin AGE key on first activation, mirroring
   # how configurations/common/crypto.nix auto-generates the host SSH key.
