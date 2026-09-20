@@ -1,5 +1,27 @@
 {
   "nodes": {
+    "chatgpt-desktop": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1789876817,
+        "lfs": true,
+        "narHash": "sha256-/AL1rJ2LzWL74/h8yS66G+fRAwf2VJtEEBE76nJn//M=",
+        "ref": "refs/heads/main",
+        "rev": "e5612213e3043d000d4695945d4743e5e25375a6",
+        "revCount": 1,
+        "type": "git",
+        "url": "https://github.com/joe-broder15/chatgpt-desktop-nix-flake.git"
+      },
+      "original": {
+        "lfs": true,
+        "type": "git",
+        "url": "https://github.com/joe-broder15/chatgpt-desktop-nix-flake.git"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -38,6 +60,7 @@
     },
     "root": {
       "inputs": {
+        "chatgpt-desktop": "chatgpt-desktop",
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs",
         "sops-nix": "sops-nix"

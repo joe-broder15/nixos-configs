@@ -1,4 +1,9 @@
-{ pkgs, lib, ... }:
+{
+  pkgs,
+  lib,
+  chatgptDesktop,
+  ...
+}:
 
 {
   imports = [
@@ -30,6 +35,7 @@
     keepassxc
     claude-code
     codex
+    chatgptDesktop
     gh
     gnomeExtensions.dash-to-panel
     tree

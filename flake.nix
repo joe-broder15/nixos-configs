@@ -12,6 +12,11 @@
     sops-nix.url = "github:Mic92/sops-nix";
     # Same reasoning as above: avoid a second, independent nixpkgs evaluation.
     sops-nix.inputs.nixpkgs.follows = "nixpkgs";
+    chatgpt-desktop = {
+      # The Debian installer is stored in Git LFS and must be fetched with it.
+      url = "git+https://github.com/joe-broder15/chatgpt-desktop-nix-flake.git?lfs=1";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -19,10 +24,14 @@
       nixpkgs,
       home-manager,
       sops-nix,
+      chatgpt-desktop,
       ...
     }:
     let
       system = "x86_64-linux";
+      homeExtraSpecialArgs = {
+        chatgptDesktop = chatgpt-desktop.packages.${system}.default;
+      };
       # Built explicitly because homeConfigurations.zircon (below) needs a pkgs
       # argument directly; nixosSystem builds its own internally from `system`.
       pkgs = import nixpkgs {
@@ -55,6 +64,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = homeExtraSpecialArgs;
             home-manager.users.zircon = ./home/zircon.nix;
           }
           sops-nix.nixosModules.sops
@@ -71,6 +81,7 @@
           {
             home-manager.useGlobalPkgs = true;
             home-manager.useUserPackages = true;
+            home-manager.extraSpecialArgs = homeExtraSpecialArgs;
             home-manager.users.zircon = ./home/zircon.nix;
           }
           sops-nix.nixosModules.sops
@@ -83,6 +94,7 @@
       #   home-manager switch --flake .#zircon
       homeConfigurations.zircon = home-manager.lib.homeManagerConfiguration {
         inherit pkgs;
+        extraSpecialArgs = homeExtraSpecialArgs;
         modules = [ ./home/zircon.nix ];
       };
 
