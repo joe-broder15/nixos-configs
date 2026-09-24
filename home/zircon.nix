@@ -13,6 +13,7 @@
     ./kitty.nix
     ./terminator.nix
     ./vscode.nix
+    ./zellij.nix
   ];
 
   # Set explicitly (not mkDefault) so standalone `home-manager switch --flake .#zircon`
@@ -55,7 +56,7 @@
     ];
     favorite-apps = [
       "brave-browser.desktop"
-      "kitty.desktop"
+      "Alacritty.desktop"
       "code.desktop"
       "org.gnome.Nautilus.desktop"
       "discord.desktop"
@@ -71,6 +72,16 @@
     settings.user = {
       name = "joe-broder15";
       email = "joe.broder@proton.me";
+    };
+  };
+
+  # Same font as kitty.nix; GohuFont is a bitmap font, so size must be 11 or 14.
+  programs.alacritty = {
+    enable = true;
+    theme = "dracula";
+    settings.font = {
+      normal.family = "GohuFont 11 Nerd Font Mono";
+      size = 11;
     };
   };
 
