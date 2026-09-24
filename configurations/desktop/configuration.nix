@@ -56,7 +56,14 @@
     ];
   };
 
-  programs.firefox.enable = true;
+  services.udev.extraRules = ''
+    # Disable DualShock 4 touchpad as desktop mouse
+    # USB
+    ATTRS{name}=="Sony Interactive Entertainment Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
+
+    # Bluetooth
+    ATTRS{name}=="Wireless Controller Touchpad", ENV{LIBINPUT_IGNORE_DEVICE}="1"
+  '';
 
   programs.steam.enable = true;
 
