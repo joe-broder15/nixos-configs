@@ -24,6 +24,13 @@
       size = 32;
     };
 
+    # Font package is installed in zircon.nix (nerd-fonts.gohufont).
+    # GohuFont is a bitmap font; point size must be 11 or 14.
+    font = {
+      name = "GohuFont 11 Nerd Font";
+      size = 11;
+    };
+
     gtk3.extraConfig = {
       gtk-application-prefer-dark-theme = true;
     };
@@ -40,13 +47,14 @@
   };
 
   # GNOME reads theme names from dconf independently of the gtk.* options above;
-  # keep these three names in sync with theme/iconTheme/cursorTheme by hand.
+  # keep these names in sync with theme/iconTheme/cursorTheme/font by hand.
   dconf.settings = {
     "org/gnome/desktop/interface" = {
       gtk-theme = "Dracula";
       icon-theme = "Papirus-Dark";
       cursor-theme = "Dracula-cursors";
       color-scheme = "prefer-dark";
+      font-name = "GohuFont 11 Nerd Font 11";
     };
   };
 }
