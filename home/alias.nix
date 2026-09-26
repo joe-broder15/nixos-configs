@@ -8,16 +8,21 @@
     # List only the aliases managed by this file.
     # NOTE: this string is hand-written, not generated from the aliases below;
     # update it manually whenever an alias here is added, removed, or renamed.
-    help = "printf '%s\\n' 'Available aliases:' '  gs                Show Git status' '  help              Show this alias list' '  hmp               Pull and reload Home Manager' '  hmr               Reload Home Manager' '  home              Go to the home directory' '  host-age-pubkey   Print the host AGE public key' '  icat              Preview an image in-terminal (kitty icat kitten)' '  jfu               journalctl -f -u (follow a units logs)' '  kdiff             Side-by-side diff (kitty diff kitten)' '  ll                List files by modification time' '  palette           Browse/run kitty actions (kitty command_palette kitten)' '  syno              Go to the Synology share' '  update-sops-keys  Update SOPS recipients' '  user-age-pubkey   Print your personal sops AGE public key' '  wg-start          Start the wg0 WireGuard service' '  wg-stop           Stop the wg0 WireGuard service' '  za                Attach to the newest zellij session' '  zka               Kill all zellij sessions' '  zls               List zellij sessions'";
+    help = "printf '%s\\n' 'Available aliases:' '  gs                Show Git status' '  help              Show this alias list' '  hmp               Pull and reload Home Manager (nixos-rebuild on NixOS-managed hosts)' '  hmr               Reload Home Manager (nixos-rebuild on NixOS-managed hosts)' '  home              Go to the home directory' '  host-age-pubkey   Print the host AGE public key' '  icat              Preview an image in-terminal (kitty icat kitten)' '  jfu               journalctl -f -u (follow a units logs)' '  kdiff             Side-by-side diff (kitty diff kitten)' '  ll                List files by modification time' '  palette           Browse/run kitty actions (kitty command_palette kitten)' '  syno              Go to the Synology share' '  update-sops-keys  Update SOPS recipients' '  user-age-pubkey   Print your personal sops AGE public key' '  wg-start          Start the wg0 WireGuard service' '  wg-stop           Stop the wg0 WireGuard service' '  za                Attach to the newest zellij session' '  zka               Kill all zellij sessions' '  zls               List zellij sessions'";
     # Derive the AGE public key sops-nix uses for this host, per configurations/common/crypto.nix.
     "host-age-pubkey" = "nix run nixpkgs#ssh-to-age -- -i /etc/ssh/ssh_host_ed25519_key.pub";
     # Print your personal sops-nix admin AGE public key, from its recorded comment in the age keys file.
     "user-age-pubkey" = "sed -n 's/^# public key: //p' ~/.config/sops/age/keys.txt";
     "update-sops-keys" = "sops updatekeys secrets/common.yaml";
     # Reload the zircon Home Manager config from this repo's flake.
-    hmr = "home-manager switch --flake ~/nixos-configs#zircon";
-    # Pull latest changes first, then reload.
-    hmp = "git -C ~/nixos-configs pull && home-manager switch --flake ~/nixos-configs#zircon";
+    # On hosts where NixOS manages Home Manager (thinkpad, desktop), a standalone
+    # switch would install a second copy of the packages into ~/.nix-profile,
+    # which the next nixos-rebuild uninstalls, breaking any shell that resolved
+    # binaries (e.g. starship) from there. So on those hosts, delegate to the
+    # rebuild scripts instead; the config name is the hostname minus "-nixos".
+    hmr = "if systemctl cat home-manager-$USER.service >/dev/null 2>&1; then ~/nixos-configs/scripts/rebuild.sh \${HOST%-nixos}; else home-manager switch --flake ~/nixos-configs#zircon; fi";
+    # Pull latest changes first, then reload (same NixOS delegation as hmr).
+    hmp = "if systemctl cat home-manager-$USER.service >/dev/null 2>&1; then ~/nixos-configs/scripts/pull-and-rebuild.sh \${HOST%-nixos}; else git -C ~/nixos-configs pull && home-manager switch --flake ~/nixos-configs#zircon; fi";
     # Jump to the home directory.
     home = "cd ~";
     # Jump to the Synology CIFS share.

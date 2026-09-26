@@ -68,3 +68,5 @@ The `zircon` user's Home Manager config lives in `home/zircon.nix` and is consum
   `home-manager.users.zircon = import ./home/zircon.nix;`, so the profile is built and activated with every `nixos-rebuild`.
 
 The same module file is reused in both paths; `home.username`/`home.homeDirectory` are set explicitly so it works standalone, and the NixOS module sets the same values via `mkDefault` so there is no conflict.
+
+On NixOS-integrated hosts, don't run a standalone `home-manager switch`: it installs a second copy of the packages into `~/.nix-profile`, which the next `nixos-rebuild` uninstalls, breaking already-open shells that resolved binaries (e.g. starship) from there. The `hmr`/`hmp` aliases detect this (via the `home-manager-$USER.service` unit) and delegate to `scripts/rebuild.sh` / `scripts/pull-and-rebuild.sh` instead.
