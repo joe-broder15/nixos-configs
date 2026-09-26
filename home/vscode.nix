@@ -13,9 +13,9 @@
       "terminal.integrated.fontFamily" = "'GohuFont 11 Nerd Font Mono'";
       "terminal.integrated.fontSize" = 12;
       # Same quoting rule as the terminal font above.
-      "editor.fontFamily" = "'GohuFont 11 Nerd Font Mono'";
+      "editor.fontFamily" = "'GohuFont 14 Nerd Font Mono'";
       # GohuFont is a bitmap font; point size must be 11 or 14.
-      "editor.fontSize" = 11;
+      "editor.fontSize" = 14;
       # Must match the "label" in the dracula-theme extension's package.json,
       # not just "Dracula".
       "workbench.colorTheme" = "Dracula Theme";
