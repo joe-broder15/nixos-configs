@@ -16,8 +16,13 @@
         automount_opts = "x-systemd.automount,noauto,x-systemd.idle-timeout=60,x-systemd.device-timeout=5s,x-systemd.mount-timeout=5s";
       in
       # uid=1000 assumes the primary interactive user (zircon); gid=100 is
-      # NixOS's default "users" group.
-      [ "${automount_opts},credentials=${config.sops.templates."smb-secrets".path},uid=1000,gid=100" ];
+      # NixOS's default "users" group. x-gvfs-show lists the mount in the
+      # Nautilus/GNOME sidebar; clicking it triggers the automount.
+      [
+        "${automount_opts},x-gvfs-show,x-gvfs-name=Library1,credentials=${
+          config.sops.templates."smb-secrets".path
+        },uid=1000,gid=100"
+      ];
   };
 
   sops.secrets."smb_secrets/synology_creds/username" = { };
