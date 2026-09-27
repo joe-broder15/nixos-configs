@@ -34,6 +34,7 @@
     protonmail-desktop
     proton-vpn
     keepassxc
+    obsidian
     claude-code
     codex
     chatgptDesktop
