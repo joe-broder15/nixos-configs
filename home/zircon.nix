@@ -67,6 +67,12 @@
     ];
   };
 
+  # Theme lives in tui.json (programs.opencode.tui), not the main opencode.json.
+  programs.opencode = {
+    enable = true;
+    tui.theme = "dracula";
+  };
+
   programs.git = {
     enable = true;
     settings.user = {
