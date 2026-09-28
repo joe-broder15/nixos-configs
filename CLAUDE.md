@@ -35,7 +35,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   └── thinkpad/
 │       └── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, and ../common/wireguard.nix (client-only, no NAT).
 ├── home/
-│   ├── alias.nix                          # Shell aliases (ll, gs, help, host-age-pubkey, user-age-pubkey, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop, icat, kdiff, palette, zls, za, zka) imported by zircon.nix.
+│   ├── alias.nix                          # Shell aliases (ll, gs, help, host-age-pubkey, user-age-pubkey, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop, icat, kdiff, palette, zls, za, zd, zka) imported by zircon.nix.
 │   ├── gtk.nix                            # GTK theme (Dracula, via pkgs.dracula-theme, incl. gtk4), icon theme (vanilla Papirus-Dark), cursor theme (Dracula-cursors, bundled in pkgs.dracula-theme), and system font (GohuFont 11 Nerd Font) config, imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   ├── zellij.nix                         # Zellij config (Dracula theme, full pane frames, no zsh auto-start) with a zellaude tab bar (Claude Code activity per tab; pinned release wasm, jq for its hook) on top and a zjstatus (nixpkgs zellijPlugins) + zjstatus-hints (pinned release wasm) keybinding-hints bar on the bottom; imported by zircon.nix.

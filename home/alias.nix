@@ -8,7 +8,7 @@
     # List only the aliases managed by this file.
     # NOTE: this string is hand-written, not generated from the aliases below;
     # update it manually whenever an alias here is added, removed, or renamed.
-    help = "printf '%s\\n' 'Available aliases:' '  gs                Show Git status' '  help              Show this alias list' '  hmp               Pull and reload Home Manager (nixos-rebuild on NixOS-managed hosts)' '  hmr               Reload Home Manager (nixos-rebuild on NixOS-managed hosts)' '  home              Go to the home directory' '  host-age-pubkey   Print the host AGE public key' '  icat              Preview an image in-terminal (kitty icat kitten)' '  jfu               journalctl -f -u (follow a units logs)' '  kdiff             Side-by-side diff (kitty diff kitten)' '  ll                List files by modification time' '  palette           Browse/run kitty actions (kitty command_palette kitten)' '  syno              Go to the Synology share' '  update-sops-keys  Update SOPS recipients' '  user-age-pubkey   Print your personal sops AGE public key' '  wg-start          Start the wg0 WireGuard service' '  wg-stop           Stop the wg0 WireGuard service' '  za                Attach to the newest zellij session' '  zka               Kill all zellij sessions' '  zls               List zellij sessions'";
+    help = "printf '%s\\n' 'Available aliases:' '  gs                Show Git status' '  help              Show this alias list' '  hmp               Pull and reload Home Manager (nixos-rebuild on NixOS-managed hosts)' '  hmr               Reload Home Manager (nixos-rebuild on NixOS-managed hosts)' '  home              Go to the home directory' '  host-age-pubkey   Print the host AGE public key' '  icat              Preview an image in-terminal (kitty icat kitten)' '  jfu               journalctl -f -u (follow a units logs)' '  kdiff             Side-by-side diff (kitty diff kitten)' '  ll                List files by modification time' '  palette           Browse/run kitty actions (kitty command_palette kitten)' '  syno              Go to the Synology share' '  update-sops-keys  Update SOPS recipients' '  user-age-pubkey   Print your personal sops AGE public key' '  wg-start          Start the wg0 WireGuard service' '  wg-stop           Stop the wg0 WireGuard service' '  za                Attach to the newest zellij session' '  zd                Detach from the current zellij session' '  zka               Kill all zellij sessions' '  zls               List zellij sessions'";
     # Derive the AGE public key sops-nix uses for this host, per configurations/common/crypto.nix.
     "host-age-pubkey" = "nix run nixpkgs#ssh-to-age -- -i /etc/ssh/ssh_host_ed25519_key.pub";
     # Print your personal sops-nix admin AGE public key, from its recorded comment in the age keys file.
@@ -41,6 +41,7 @@
     # zellij session helpers; `zellij ls` lists oldest first, so the last entry is the newest session.
     zls = "zellij list-sessions";
     za = "zellij attach \"$(zellij list-sessions --short | tail -n 1)\"";
+    zd = "zellij action detach";
     zka = "zellij kill-all-sessions --yes";
   };
 }
