@@ -90,6 +90,7 @@
       normal.family = "GohuFont 11 Nerd Font Mono";
       size = 11;
     };
+    settings.cursor.style.shape = "Beam";
   };
 
   programs.home-manager.enable = true;
