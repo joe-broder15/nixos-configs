@@ -75,19 +75,6 @@ in
         '';
       };
 
-      "openwebui.${baseDomain}" = lib.recursiveUpdate (localProxy 8080) {
-        locations."/".extraConfig = ''
-          # Streaming responses (SSE) must not be buffered or they arrive garbled/delayed.
-          proxy_buffering off;
-          proxy_cache off;
-
-          # LLM completions can run long; keep the connection open.
-          proxy_read_timeout 1800s;
-          proxy_send_timeout 1800s;
-          proxy_connect_timeout 1800s;
-        '';
-      };
-
       "proxmox.${baseDomain}" = lib.recursiveUpdate (mkProxy "https://192.168.1.100:8006") {
         locations."/".extraConfig = ''
           # Proxmox upstream commonly uses a self-signed TLS certificate.

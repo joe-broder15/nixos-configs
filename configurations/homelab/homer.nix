@@ -47,11 +47,6 @@ in
               url = "https://ddns.${baseDomain}";
             }
             {
-              name = "Open WebUI";
-              logo = logo "open-webui";
-              url = "https://openwebui.${baseDomain}";
-            }
-            {
               # proxy.nix reverse-proxies this to Proxmox's actual host at 192.168.1.100.
               name = "Proxmox";
               logo = logo "proxmox";

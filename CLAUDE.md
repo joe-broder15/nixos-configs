@@ -28,7 +28,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── desktop/
 │   │   └── configuration.nix              # Desktop-class machine config with GNOME/GDM, same profile as ../thinkpad/configuration.nix plus NVIDIA GPU support (RTX 2080 Super via hardware.nvidia, proprietary driver); imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, and ../common/wireguard.nix (client-only, no NAT; own WireGuard secret, separate from thinkpad's).
 │   ├── homelab/
-│   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options (incl. Ollama + Open WebUI); imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; }) for its sops-nix wiring, and ../common/wireguard.nix (with NAT out ens18).
+│   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; }) for its sops-nix wiring, and ../common/wireguard.nix (with NAT out ens18).
 │   │   ├── domain.nix                     # Defines the shared baseDomain module arg used by proxy.nix and homer.nix.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.

@@ -74,17 +74,6 @@
       scanner.enable = true;
       daemon.enable = true;
     };
-
-    # CPU-only until a GPU is available; swap to pkgs.ollama for GPU acceleration.
-    ollama = {
-      enable = true;
-      package = pkgs.ollama-cpu;
-      host = "0.0.0.0";
-      openFirewall = true;
-      loadModels = [ "deepseek-r1:1.5b" ]; # small enough to run tolerably CPU-only
-    };
-
-    open-webui.enable = true; # finds Ollama automatically at its default localhost:11434 API
   };
 
   networking.firewall = {
@@ -95,8 +84,6 @@
       80 # HTTP — nginx redirects to HTTPS
       443 # HTTPS — nginx
       22 # SSH
-      8080 # Open WebUI
-      11434 # Ollama API — also opened by services.ollama.openFirewall
     ];
   };
 
