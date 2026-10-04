@@ -17,6 +17,9 @@
       url = "git+https://github.com/joe-broder15/chatgpt-desktop-nix-flake.git?lfs=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Hermes Agent (homelab). Deliberately not following our nixpkgs: its
+    # packages are built and tested against its own pinned one.
+    hermes-agent.url = "github:NousResearch/hermes-agent";
   };
 
   outputs =
@@ -25,6 +28,7 @@
       home-manager,
       sops-nix,
       chatgpt-desktop,
+      hermes-agent,
       ...
     }:
     let
@@ -49,6 +53,7 @@
           /etc/nixos/hardware-configuration.nix
           ./configurations/homelab/configuration.nix
           sops-nix.nixosModules.sops
+          hermes-agent.nixosModules.default
         ];
       };
 

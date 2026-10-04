@@ -8,6 +8,7 @@ NixOS configurations for homelab machines, built with flakes.
 Opinionated NixOS configuration for the homelab server running on a Proxmox VM.
 - `configurations/homelab/configuration.nix` is the main module for host/system settings; it also imports the shared `configurations/common/base.nix` module for common host defaults, `configurations/common/crypto.nix` and `configurations/common/synology.nix` modules for a CIFS mount at `//synology.local/Library1` with credentials rendered by sops-nix, along with `configurations/common/namecheap-ddns-updater.nix` (imported as `(import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })`) for its sops-nix wiring and the shared `configurations/common/wireguard.nix` module (parameterized with its own secret key and NAT'd out `ens18`).
 - `configurations/homelab/proxy.nix` contains nginx reverse-proxy and ACME certificate settings.
+- `configurations/homelab/hermes.nix` runs Hermes Agent via the `hermes-agent` flake input's NixOS module, using the ChatGPT subscription through Codex OAuth (one-time login after first deploy: `sudo -u hermes HERMES_HOME=/var/lib/hermes/.hermes hermes auth add openai-codex`).
 - `configurations/common/namecheap-ddns-updater.nix` is a `{ domain }: { ... }` function containing the DDNS Updater package, its sops-nix secrets/template, and the `services.ddns-updater` block; it hardcodes `provider = "namecheap"`, takes `domain` as a parameter, and sources only the account password from sops-nix. It lives under `configurations/common/` but is only imported by homelab.
 - Hardware configuration is read from `/etc/nixos/hardware-configuration.nix` on the host (not versioned in this repo).
 
@@ -76,6 +77,7 @@ The Synology CIFS credentials (shared by homelab, thinkpad, and desktop via `con
 - Plex Media Server.
 - Resilio Sync with WebUI and shared-folder root at `/resilio-shared-folders`.
 - ClamAV daemon and on-demand scanner.
+- Hermes Agent gateway (no messaging platforms; ChatGPT subscription via Codex OAuth).
 - CIFS mount for `//synology.local/Library1`.
 - Miscellaneous CLI tooling: `vim`, `wget`, `htop`, `fastfetch`, `tree`, `wireguard-tools`, etc.
 

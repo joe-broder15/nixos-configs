@@ -13,7 +13,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 .
 ├── .sops.yaml                             # SOPS creation rules and public Age recipients for encrypted files under secrets/.
 ├── README.md                              # Repo overview, supporting files, services, and workflow docs.
-├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix; hardware config read from /etc/nixos/hardware-configuration.nix on the host.
+├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix (plus hermes-agent's NixOS module for homelab); hardware config read from /etc/nixos/hardware-configuration.nix on the host.
 ├── flake.lock                             # Pinned input versions for the flake.
 ├── configurations/
 │   ├── common/
@@ -30,6 +30,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── homelab/
 │   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; }) for its sops-nix wiring, and ../common/wireguard.nix (with NAT out ens18).
 │   │   ├── domain.nix                     # Defines the shared baseDomain module arg used by proxy.nix and homer.nix.
+│   │   ├── hermes.nix                     # Hermes Agent service (hermes-agent flake input's NixOS module): no messaging platforms, model via ChatGPT subscription (openai-codex OAuth, logged in manually once), CLI on PATH.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
 │   └── thinkpad/
