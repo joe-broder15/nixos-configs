@@ -12,7 +12,6 @@
     ./domain.nix
     ./proxy.nix
     ./homer.nix
-    ./openclaw.nix
     (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })
     (import ../common/wireguard.nix {
       secretKey = "wireguard_secrets/homelab_proton_vpn_config";
