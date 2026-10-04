@@ -72,10 +72,24 @@ let
   workspaceFiles = {
     "AGENTS.md" = ./openclaw/AGENTS.md;
     "SOUL.md" = ./openclaw/SOUL.md;
-    "TOOLS.md" = ./openclaw/TOOLS.md;
     "IDENTITY.md" = ./openclaw/IDENTITY.md;
-    "USER.md" = ./openclaw/USER.md;
   };
+
+  # USER.md is the agent's own memory of the user (it rewrites it as it
+  # learns), so it's only seeded from the repo when missing, never managed.
+  # Also clears leftover read-only store symlinks from files that used to be
+  # managed: USER.md, and TOOLS.md (retired by OpenClaw; its notes now live in
+  # AGENTS.md's ## Tools section).
+  prepareWorkspace = pkgs.writeShellScript "openclaw-prepare-workspace" ''
+    for f in USER.md TOOLS.md; do
+      if [ -L ${workspaceDir}/$f ]; then
+        rm ${workspaceDir}/$f
+      fi
+    done
+    if [ ! -e ${workspaceDir}/USER.md ]; then
+      install -m 0640 ${./openclaw/USER.md} ${workspaceDir}/USER.md
+    fi
+  '';
 
   envFile = config.sops.templates."openclaw.env".path;
 
@@ -121,6 +135,7 @@ in
     package = openclawPackage;
     environmentFiles = [ envFile ];
     environment.HOME = cfg.stateDir;
+    execStartPre = [ "${prepareWorkspace}" ];
 
     config = {
       gateway = {
