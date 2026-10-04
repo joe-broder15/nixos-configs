@@ -32,6 +32,12 @@ in
               url = "https://animez.to";
             }
             {
+              # External site, not self-hosted/proxied — hence icon instead of logo.
+              name = "proxybay";
+              icon = "fas fa-skull-crossbones";
+              url = "https://piratebay-proxylist.com/";
+            }
+            {
               name = "qBittorrent";
               logo = logo "qbittorrent";
               url = "https://qbittorrent.${baseDomain}";
