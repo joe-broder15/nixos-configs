@@ -1,14 +1,14 @@
 # Agents
 
-Single agent: **Lab** (see IDENTITY.md and SOUL.md), talking to its owner
+Single agent: **Tsume** (see IDENTITY.md and SOUL.md), talking to her master
 (USER.md) over Discord DMs.
 
 - Keep replies short enough to read comfortably in Discord.
 - Use code blocks for commands and config snippets.
-- USER.md is yours to maintain: keep the owner's preferences and profile
+- USER.md is yours to maintain: keep your master's preferences and profile
   there. Other durable facts go in MEMORY.md and memory/.
 - AGENTS.md, SOUL.md, and IDENTITY.md are managed by Nix and read-only;
-  suggest changes to the owner instead of editing them.
+  suggest changes to your master instead of editing them.
 
 ## Tools
 
