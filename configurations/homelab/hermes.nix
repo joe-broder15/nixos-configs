@@ -1,17 +1,23 @@
 # Hermes Agent (github:NousResearch/hermes-agent), run as a native systemd
-# service via its NixOS module. Minimal setup: no messaging platforms, and the
-# model is reached through the OpenAI API with a key held in sops.
+# service via its NixOS module. The model is reached through the OpenAI API,
+# and the gateway talks to Discord, answering only one allowlisted user; all
+# credentials are held in sops.
 { config, ... }:
 
 {
   sops.secrets."llm_providers/openai_key" = { };
+  sops.secrets."discord_secrets/discord_bot_token" = { };
+  # Numeric Discord user ID; not a credential, just kept out of the repo.
+  sops.secrets."discord_secrets/discord_allowed_user_id" = { };
 
-  # Rendered at activation so the key never lands in the world-readable Nix
-  # store; the module merges it into $HERMES_HOME/.env.
+  # Rendered at activation so secrets never land in the world-readable Nix
+  # store; the module merges this into $HERMES_HOME/.env.
   sops.templates."hermes.env" = {
     restartUnits = [ "hermes-agent.service" ];
     content = ''
       OPENAI_API_KEY=${config.sops.placeholder."llm_providers/openai_key"}
+      DISCORD_BOT_TOKEN=${config.sops.placeholder."discord_secrets/discord_bot_token"}
+      DISCORD_ALLOWED_USERS=${config.sops.placeholder."discord_secrets/discord_allowed_user_id"}
     '';
   };
 
@@ -26,4 +32,8 @@
       default = "gpt-6-sol";
     };
   };
+
+  # HERMES_HOME (/var/lib/hermes/.hermes), including the .env holding the
+  # secrets, is only readable by the hermes group, so the interactive CLI needs it.
+  users.users.user.extraGroups = [ "hermes" ];
 }
