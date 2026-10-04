@@ -19,6 +19,52 @@ let
     "codex" # ChatGPT/Codex subscription auth for openai/* models
   ];
 
+  # WORKAROUND for https://github.com/openclaw/nix-openclaw/issues/158 — delete
+  # once fixed. OpenClaw only grants plugins keyed-store access (which discord
+  # and codex need) if they're bundled or have an official npm install record,
+  # and Nix-loaded plugins have neither. So copy the gateway and drop the
+  # Nix-built, hash-pinned official plugins into its own bundled extensions
+  # dir, where they load with origin "bundled". A real copy is needed because
+  # OpenClaw resolves its package root through symlinks.
+  #
+  # Each plugin's node_modules is moved outside dist/ (dist-runtime is a
+  # symlink to it) and linked back: OpenClaw's ESM fast-path resolver forces
+  # every relative ./x.js import under dist/ to load as ESM, which breaks CJS
+  # deps such as discord-api-types. Node resolves deps by realpath, so the
+  # hook no longer sees them.
+  gatewayWithPlugins =
+    let
+      gateway = openclawPkgs.openclaw-gateway;
+    in
+    pkgs.runCommand "openclaw-gateway-bundled-${gateway.version}" { } ''
+      cp -a ${gateway} $out
+      chmod -R u+w $out
+      substituteInPlace $out/bin/openclaw --replace-fail ${gateway} $out
+      ext=$out/lib/node_modules/openclaw/dist/extensions
+      deps=$out/lib/openclaw-plugin-deps
+      ${lib.concatMapStrings (id: ''
+        cp -a ${openclawPkgs."openclaw-runtime-plugin-${id}"} $ext/${id}
+        chmod -R u+w $ext/${id}
+        if [ -L $ext/${id}/node_modules/openclaw ]; then
+          ln -sfn $out/lib/openclaw $ext/${id}/node_modules/openclaw
+        fi
+        if [ -d $ext/${id}/node_modules ]; then
+          mkdir -p $deps/${id}
+          mv $ext/${id}/node_modules $deps/${id}/node_modules
+          ln -s $deps/${id}/node_modules $ext/${id}/node_modules
+        fi
+      '') runtimePlugins}
+    '';
+
+  # nix-openclaw's batteries-included `openclaw` wrapper (extra tool CLIs on
+  # PATH), re-pointed at the gateway above.
+  openclawPackage = pkgs.runCommand "openclaw-bundled-${openclawPkgs.openclaw-gateway.version}" { } ''
+    mkdir -p $out/bin
+    substitute ${openclawPkgs.openclaw}/bin/openclaw $out/bin/openclaw \
+      --replace-fail ${openclawPkgs.openclaw-gateway} ${gatewayWithPlugins}
+    chmod +x $out/bin/openclaw
+  '';
+
   workspaceDir = "${cfg.stateDir}/workspace";
 
   # Repo-managed workspace files, symlinked into the otherwise-writable
@@ -72,14 +118,9 @@ in
 
   services.openclaw-gateway = {
     enable = true;
-    package = openclawPkgs.openclaw;
+    package = openclawPackage;
     environmentFiles = [ envFile ];
-    environment = {
-      HOME = cfg.stateDir;
-      # Matches what the Home Manager module sets when runtime plugins are
-      # loaded from Nix store paths instead of `openclaw plugins install`.
-      OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY = "1";
-    };
+    environment.HOME = cfg.stateDir;
 
     config = {
       gateway = {
@@ -95,20 +136,16 @@ in
         };
       };
 
-      # External runtime plugins, loaded from Nix-built store paths; the Home
-      # Manager module's runtimePlugins option does exactly this under the hood.
-      plugins = {
-        load.paths = map (id: "${openclawPkgs."openclaw-runtime-plugin-${id}"}") runtimePlugins;
-        entries = lib.genAttrs runtimePlugins (_: {
-          enabled = true;
-        });
-      };
+      # Bundled into the gateway above, so they only need enabling.
+      plugins.entries = lib.genAttrs runtimePlugins (_: {
+        enabled = true;
+      });
 
       agents.defaults = {
         workspace = workspaceDir;
         # Workspace files come from this repo; don't let OpenClaw seed its own.
         skipBootstrap = true;
-        model.primary = "openai/gpt-6-astra";
+        model.primary = "openai/gpt-5.6-sol";
       };
 
       channels.discord = {
