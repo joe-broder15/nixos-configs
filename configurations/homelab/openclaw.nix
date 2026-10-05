@@ -29,7 +29,16 @@ let
       ''
         cp -a ${pkgs.openclaw-gateway} $out
         chmod -R u+w $out
-        cp -a ${pkgs.openclawRuntimePlugins.discord} $out/lib/node_modules/openclaw/dist/extensions/discord
+        root=$out/lib/node_modules/openclaw
+        cp -a ${pkgs.openclawRuntimePlugins.discord} $root/dist/extensions/discord
+        chmod -R u+w $root/dist/extensions/discord
+        # OpenClaw's resolver fast path loads every relative .js import under
+        # dist/ as ESM, which breaks the plugin's CommonJS deps
+        # (discord-api-types). Keep them outside dist/ behind a symlink; Node
+        # resolves modules by real path, so they take the default resolver.
+        mkdir -p $root/plugin-deps/discord
+        mv $root/dist/extensions/discord/node_modules $root/plugin-deps/discord/node_modules
+        ln -s ../../../plugin-deps/discord/node_modules $root/dist/extensions/discord/node_modules
         substituteInPlace $out/bin/openclaw --replace-fail ${pkgs.openclaw-gateway} $out
       '';
 in
