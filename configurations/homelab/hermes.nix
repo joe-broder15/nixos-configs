@@ -38,6 +38,13 @@
     # the default local faster-whisper isn't in the Nix package.
     settings.stt.provider = "openai";
 
+    # Tsubasa, the head-maid persona. Nix owns this file, so edits Hermes makes
+    # to it are overwritten on rebuild.
+    hermesHomeFiles."SOUL.md" = ./hermes-soul.md;
+
+    # Channels where Hermes answers every message without an @mention.
+    settings.discord.free_response_channels = [ "1556451572815241360" ];
+
     # Web dashboard on 127.0.0.1:9119, reverse-proxied by proxy.nix. No login
     # is configured, so anyone who can reach the vhost gets full admin access.
     backend.mode = "dashboard";
