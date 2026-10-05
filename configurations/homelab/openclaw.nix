@@ -14,6 +14,7 @@ in
   sops.secrets."discord_secrets/discord_bot_token" = { };
   # Numeric Discord user ID; not a credential, just kept out of the repo.
   sops.secrets."discord_secrets/discord_allowed_user_id" = { };
+  sops.secrets."openclaw/gateway_token" = { };
 
   # OpenClaw loads ~/.openclaw/.env itself, in both the gateway and the CLI,
   # so the secrets reach `openclaw status` etc. without a wrapper. Rendered at
@@ -25,6 +26,7 @@ in
       OPENAI_API_KEY=${config.sops.placeholder."llm_providers/openai_key"}
       DISCORD_BOT_TOKEN=${config.sops.placeholder."discord_secrets/discord_bot_token"}
       DISCORD_ALLOWED_USER=${config.sops.placeholder."discord_secrets/discord_allowed_user_id"}
+      OPENCLAW_GATEWAY_TOKEN=${config.sops.placeholder."openclaw/gateway_token"}
     '';
   };
 
@@ -63,9 +65,13 @@ in
         gateway = {
           mode = "local";
           bind = "loopback";
-          # Loopback-only and not reverse-proxied; Discord (an outbound
-          # connection) is the only way in from outside the host.
-          auth.mode = "none";
+          # Loopback-only and not reverse-proxied. A shared token is still
+          # required: without it, local clients lacking a paired device
+          # identity (e.g. the `openclaw gateway status` probe) are rejected.
+          auth = {
+            mode = "token";
+            token = "\${OPENCLAW_GATEWAY_TOKEN}";
+          };
         };
 
         agents.defaults = {
@@ -106,7 +112,10 @@ in
         # so the unit failed with status 209 (STDOUT). Use the journal instead.
         StandardOutput = lib.mkForce "journal";
         StandardError = lib.mkForce "journal";
-        Environment = [ "PATH=/etc/profiles/per-user/user/bin:/run/current-system/sw/bin" ];
+        # The dirs `openclaw gateway status` expects, plus the NixOS profiles.
+        Environment = [
+          "PATH=/etc/profiles/per-user/user/bin:/run/current-system/sw/bin:${homeDir}/.nix-profile/bin:${homeDir}/.local/state/nix/profile/bin:/nix/profile/bin:/nix/var/nix/profiles/default/bin:${homeDir}/.local/share/pnpm/bin:${homeDir}/.local/share/pnpm:/usr/local/bin:/usr/bin:/bin"
+        ];
         RestartSec = lib.mkForce "5s";
         # Lets the gateway drain active turns before its children are killed.
         TimeoutStopSec = 330;
