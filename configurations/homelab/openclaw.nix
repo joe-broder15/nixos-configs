@@ -4,7 +4,7 @@
 # The model is reached through the OpenAI API, and the gateway talks to
 # Discord, answering only one allowlisted user; all credentials are held in
 # sops.
-{ config, ... }:
+{ config, lib, ... }:
 
 let
   homeDir = config.users.users.user.home;
@@ -89,8 +89,29 @@ in
       };
     };
 
-    # The module's unit has no [Install] section, so nothing would start it at
-    # boot; hook it into the (lingering) user manager's default target.
-    systemd.user.services.openclaw-gateway.Install.WantedBy = [ "default.target" ];
+    systemd.user.services.openclaw-gateway = {
+      # The module's unit has no [Install] section, so nothing would start it
+      # at boot; hook it into the (lingering) user manager's default target.
+      Install.WantedBy = [ "default.target" ];
+
+      # The rest brings the unit in line with what `openclaw gateway status`
+      # checks for.
+      Unit = {
+        After = [ "network-online.target" ];
+        Wants = [ "network-online.target" ];
+      };
+      Service = {
+        # The module appends to /tmp/openclaw/openclaw-gateway.log (hardcoded
+        # for the default instance), and that directory is gone after a reboot,
+        # so the unit failed with status 209 (STDOUT). Use the journal instead.
+        StandardOutput = lib.mkForce "journal";
+        StandardError = lib.mkForce "journal";
+        Environment = [ "PATH=/etc/profiles/per-user/user/bin:/run/current-system/sw/bin" ];
+        RestartSec = lib.mkForce "5s";
+        # Lets the gateway drain active turns before its children are killed.
+        TimeoutStopSec = 330;
+        KillMode = "mixed";
+      };
+    };
   };
 }
