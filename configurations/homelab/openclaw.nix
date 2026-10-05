@@ -127,6 +127,14 @@ in
           };
           dmPolicy = "allowlist";
           allowFrom = [ "\${DISCORD_ALLOWED_USER}" ];
+
+          # Home server: answers only the same allowlisted user, in every
+          # channel it can see (no channels map), without needing a mention.
+          groupPolicy = "allowlist";
+          guilds."1556451571934691410" = {
+            requireMention = false;
+            users = [ "\${DISCORD_ALLOWED_USER}" ];
+          };
         };
       };
     };
