@@ -17,11 +17,8 @@
       url = "git+https://github.com/joe-broder15/chatgpt-desktop-nix-flake.git?lfs=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # Hermes Agent (homelab). Deliberately not following our nixpkgs: its
-    # packages are built and tested against its own pinned one.
-    hermes-agent.url = "github:NousResearch/hermes-agent";
-    # OpenClaw (homelab), via the official Nix packaging. Not following our
-    # nixpkgs for the same reason as hermes-agent.
+    # OpenClaw (homelab), via the official Nix packaging. Its overlay builds
+    # against our nixpkgs; the input keeps its own pins for its tool flakes.
     nix-openclaw.url = "github:openclaw/nix-openclaw";
   };
 
@@ -31,7 +28,6 @@
       home-manager,
       sops-nix,
       chatgpt-desktop,
-      hermes-agent,
       nix-openclaw,
       ...
     }:
@@ -57,7 +53,6 @@
           /etc/nixos/hardware-configuration.nix
           ./configurations/homelab/configuration.nix
           sops-nix.nixosModules.sops
-          hermes-agent.nixosModules.default
           # Home Manager here only carries OpenClaw for `user`, following
           # nix-openclaw's agent-first setup (its overlay + Home Manager module);
           # configured in configurations/homelab/openclaw.nix.

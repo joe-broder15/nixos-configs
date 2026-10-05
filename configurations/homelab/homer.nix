@@ -1,9 +1,4 @@
-{
-  config,
-  lib,
-  baseDomain,
-  ...
-}: # supplied by domain.nix's _module.args, shared with proxy.nix
+{ baseDomain, ... }: # supplied by domain.nix's _module.args, shared with proxy.nix
 
 let
   # Pulls icons from an external CDN at render time — no local asset caching.
@@ -57,13 +52,6 @@ in
               logo = logo "ddns-updater";
               url = "https://ddns.${baseDomain}";
             }
-          ]
-          ++ lib.optional config.services.hermes-agent.enable {
-            name = "Hermes Agent";
-            icon = "fas fa-robot";
-            url = "https://hermes.${baseDomain}";
-          }
-          ++ [
             {
               # proxy.nix reverse-proxies this to Proxmox's actual host at 192.168.1.100.
               name = "Proxmox";

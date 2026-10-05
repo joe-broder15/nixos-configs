@@ -84,7 +84,7 @@ in
 
       workspace.bootstrapFiles = {
         agents = ./openclaw-workspace/AGENTS.md;
-        # Tsubasa, the head-maid persona (also used by hermes.nix).
+        # Tsubasa, the head-maid persona.
         soul = ./openclaw-workspace/SOUL.md;
         tools = ./openclaw-workspace/TOOLS.md;
         identity = ./openclaw-workspace/IDENTITY.md;

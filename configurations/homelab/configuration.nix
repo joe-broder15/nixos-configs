@@ -12,7 +12,6 @@
     ./domain.nix
     ./proxy.nix
     ./homer.nix
-    ./hermes.nix
     ./openclaw.nix
     (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })
     (import ../common/wireguard.nix {

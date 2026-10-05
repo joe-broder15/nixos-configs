@@ -75,22 +75,6 @@ in
         '';
       };
 
-      "hermes.${baseDomain}" = lib.mkIf config.services.hermes-agent.enable (
-        lib.recursiveUpdate (localProxy config.services.hermes-agent.backend.port) {
-          locations."/" = {
-            # Hermes' DNS-rebinding guard only accepts loopback Host/Origin
-            # values (setting dashboard.public_url would force a login), so
-            # present requests as local instead of using the recommended
-            # Host $host headers.
-            recommendedProxySettings = false;
-            extraConfig = ''
-              proxy_set_header Host 127.0.0.1;
-              proxy_set_header Origin http://127.0.0.1;
-            '';
-          };
-        }
-      );
-
       "proxmox.${baseDomain}" = lib.recursiveUpdate (mkProxy "https://192.168.1.100:8006") {
         locations."/".extraConfig = ''
           # Proxmox upstream commonly uses a self-signed TLS certificate.
