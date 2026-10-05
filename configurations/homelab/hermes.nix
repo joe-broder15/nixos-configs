@@ -41,7 +41,7 @@
 
     # Tsubasa, the head-maid persona. Nix owns this file, so edits Hermes makes
     # to it are overwritten on rebuild.
-    hermesHomeFiles."SOUL.md" = ./hermes-soul.md;
+    hermesHomeFiles."SOUL.md" = ./openclaw-workspace/SOUL.md;
 
     # Channels where Hermes answers every message without an @mention.
     settings.discord.free_response_channels = [ "1556451572815241360" ];

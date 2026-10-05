@@ -1,14 +1,13 @@
-# OpenClaw gateway, via nix-openclaw's official NixOS module
-# (services.openclaw-gateway, imported in flake.nix). The model is reached
-# through the OpenAI API, and the gateway talks to Discord, answering only one
-# allowlisted user; all credentials are held in sops.
-{ config, openclawPackages, ... }:
+# OpenClaw gateway, set up the way nix-openclaw's agent-first guide does it:
+# its Home Manager module (programs.openclaw, wired in by flake.nix) running a
+# systemd user service for `user`, with Nix-managed workspace bootstrap files.
+# The model is reached through the OpenAI API, and the gateway talks to
+# Discord, answering only one allowlisted user; all credentials are held in
+# sops.
+{ config, ... }:
 
 let
-  # Discord is an external runtime plugin, not part of the gateway. The NixOS
-  # module has no runtimePlugins option (only the Home Manager one does), so
-  # load the prebuilt plugin the same way that option would.
-  discordPlugin = openclawPackages.openclaw-runtime-plugin-discord;
+  homeDir = config.users.users.user.home;
 in
 {
   sops.secrets."llm_providers/openai_key" = { };
@@ -16,10 +15,12 @@ in
   # Numeric Discord user ID; not a credential, just kept out of the repo.
   sops.secrets."discord_secrets/discord_allowed_user_id" = { };
 
-  # Rendered at activation so secrets never land in the world-readable Nix
-  # store; ${VAR} strings in the config below are substituted from it.
+  # OpenClaw loads ~/.openclaw/.env itself, in both the gateway and the CLI,
+  # so the secrets reach `openclaw status` etc. without a wrapper. Rendered at
+  # activation, so they never land in the world-readable Nix store.
   sops.templates."openclaw.env" = {
-    restartUnits = [ "openclaw-gateway.service" ];
+    owner = "user";
+    path = "${homeDir}/.openclaw/.env";
     content = ''
       OPENAI_API_KEY=${config.sops.placeholder."llm_providers/openai_key"}
       DISCORD_BOT_TOKEN=${config.sops.placeholder."discord_secrets/discord_bot_token"}
@@ -27,52 +28,69 @@ in
     '';
   };
 
-  services.openclaw-gateway = {
-    enable = true;
-    package = openclawPackages.openclaw;
-    environmentFiles = [ config.sops.templates."openclaw.env".path ];
-    environment = {
-      # Set by the Home Manager module but not the NixOS one: the config is
-      # immutable, so setup/onboarding/self-update flows refuse to rewrite it.
-      OPENCLAW_NIX_MODE = "1";
-      # Plugins come only from plugins.load.paths below.
-      OPENCLAW_DISABLE_PERSISTED_PLUGIN_REGISTRY = "1";
-      # This unit owns the lifecycle; keep doctor from installing its own.
-      OPENCLAW_SERVICE_REPAIR_POLICY = "external";
-    };
+  # sops-nix would otherwise create ~/.openclaw as root for the .env link,
+  # leaving Home Manager unable to write the rest of the state dir.
+  system.activationScripts.openclawStateDir = {
+    deps = [ "users" ];
+    text = ''
+      install -d -m 0700 -o user -g ${config.users.users.user.group} ${homeDir}/.openclaw
+    '';
+  };
+  system.activationScripts.setupSecrets.deps = [ "openclawStateDir" ];
 
-    config = {
-      gateway = {
-        mode = "local";
-        bind = "loopback";
-        # Loopback-only and not reverse-proxied; Discord (an outbound
-        # connection) is the only way in from outside the host.
-        auth.mode = "none";
+  # Start user@ at boot, so the gateway (a user service) runs without a login.
+  users.users.user.linger = true;
+
+  home-manager.users.user = {
+    home.stateVersion = "24.11";
+
+    programs.openclaw = {
+      enable = true;
+
+      workspace.bootstrapFiles = {
+        agents = ./openclaw-workspace/AGENTS.md;
+        # Tsubasa, the head-maid persona (also used by hermes.nix).
+        soul = ./openclaw-workspace/SOUL.md;
+        tools = ./openclaw-workspace/TOOLS.md;
+        identity = ./openclaw-workspace/IDENTITY.md;
+        user = ./openclaw-workspace/USER.md;
       };
 
-      agents.defaults = {
-        model.primary = "openai/gpt-6-sol";
-        # Without an explicit runtime, OpenAI models may be routed to the Codex
-        # app-server harness (a separate plugin wanting a ChatGPT login); the
-        # embedded runtime uses OPENAI_API_KEY directly.
-        models."openai/gpt-6-sol".agentRuntime.id = "openclaw";
-      };
+      # Discord is an external runtime plugin; this packages it immutably.
+      runtimePlugins = [ "discord" ];
 
-      plugins = {
-        load.paths = [ "${discordPlugin}" ];
-        entries.discord.enabled = true;
-      };
-
-      channels.discord = {
-        enabled = true;
-        token = {
-          source = "env";
-          provider = "default";
-          id = "DISCORD_BOT_TOKEN";
+      config = {
+        gateway = {
+          mode = "local";
+          bind = "loopback";
+          # Loopback-only and not reverse-proxied; Discord (an outbound
+          # connection) is the only way in from outside the host.
+          auth.mode = "none";
         };
-        dmPolicy = "allowlist";
-        allowFrom = [ "\${DISCORD_ALLOWED_USER}" ];
+
+        agents.defaults = {
+          model.primary = "openai/gpt-6-sol";
+          # Without an explicit runtime, OpenAI models may be routed to the
+          # Codex app-server harness (a separate plugin wanting a ChatGPT
+          # login); the embedded runtime uses OPENAI_API_KEY directly.
+          models."openai/gpt-6-sol".agentRuntime.id = "openclaw";
+        };
+
+        channels.discord = {
+          enabled = true;
+          token = {
+            source = "env";
+            provider = "default";
+            id = "DISCORD_BOT_TOKEN";
+          };
+          dmPolicy = "allowlist";
+          allowFrom = [ "\${DISCORD_ALLOWED_USER}" ];
+        };
       };
     };
+
+    # The module's unit has no [Install] section, so nothing would start it at
+    # boot; hook it into the (lingering) user manager's default target.
+    systemd.user.services.openclaw-gateway.Install.WantedBy = [ "default.target" ];
   };
 }

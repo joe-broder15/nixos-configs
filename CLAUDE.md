@@ -13,7 +13,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 .
 ├── .sops.yaml                             # SOPS creation rules and public Age recipients for encrypted files under secrets/.
 ├── README.md                              # Repo overview, supporting files, services, and workflow docs.
-├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix (plus hermes-agent's and nix-openclaw's NixOS modules for homelab, with nix-openclaw's packages passed as the openclawPackages specialArg); hardware config read from /etc/nixos/hardware-configuration.nix on the host.
+├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix (plus, for homelab, hermes-agent's NixOS module and Home Manager carrying nix-openclaw's overlay and Home Manager module for `user`); hardware config read from /etc/nixos/hardware-configuration.nix on the host.
 ├── flake.lock                             # Pinned input versions for the flake.
 ├── configurations/
 │   ├── common/
@@ -32,7 +32,8 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   │   ├── domain.nix                     # Defines the shared baseDomain module arg used by proxy.nix and homer.nix.
 │   │   ├── hermes.nix                     # Hermes Agent service (currently disabled; its proxy vhost and Homer link are gated on enable) (hermes-agent flake input's NixOS module): Discord (one allowlisted user ID from sops), model via the OpenAI API (openai-api provider) with OPENAI_API_KEY rendered from sops (llm_providers/openai_key), CLI on PATH.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
-│   │   ├── openclaw.nix                   # OpenClaw gateway via nix-openclaw's NixOS module (services.openclaw-gateway): loopback-only, no gateway auth, model openai/gpt-6-sol on the embedded runtime with OPENAI_API_KEY from sops, Discord via the prebuilt runtime plugin (bot token and one allowlisted user ID from sops), Nix mode.
+│   │   ├── openclaw.nix                   # OpenClaw gateway per nix-openclaw's agent-first setup: Home Manager programs.openclaw for `user` (systemd user service, linger, WantedBy default.target), workspace bootstrap files from openclaw-workspace/, Discord runtime plugin, loopback-only with no gateway auth, model openai/gpt-6-sol on the embedded runtime; secrets rendered by sops into ~/.openclaw/.env (read by both gateway and CLI).
+│   │   ├── openclaw-workspace/            # Nix-managed OpenClaw workspace bootstrap files (AGENTS, SOUL, TOOLS, IDENTITY, USER .md); SOUL.md is the Tsubasa persona, also used by hermes.nix.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
 │   └── thinkpad/
 │       └── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, and ../common/wireguard.nix (client-only, no NAT).
