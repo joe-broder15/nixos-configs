@@ -127,8 +127,15 @@ in
           };
           dmPolicy = "allowlist";
           allowFrom = [ "\${DISCORD_ALLOWED_USER}" ];
-          # DMs only: with no guilds allowlisted, server messages are ignored.
+          # Servers are allowlisted: only the listed guild, and within it only
+          # the listed channel (a channels map is itself an allowlist). Answers
+          # the same allowlisted user as DMs, without needing a mention.
           groupPolicy = "allowlist";
+          guilds."1556544589836329000" = {
+            requireMention = false;
+            users = [ "\${DISCORD_ALLOWED_USER}" ];
+            channels."1556544594735530016".enabled = true;
+          };
         };
       };
     };
