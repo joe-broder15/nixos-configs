@@ -4,10 +4,34 @@
 # The model is reached through the OpenAI API, and the gateway talks to
 # Discord, answering only one allowlisted user; all credentials are held in
 # sops.
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 
 let
   homeDir = config.users.users.user.home;
+
+  # Workaround for nix-openclaw#158 (accepted risk): loaded via runtimePlugins
+  # (plugins.load.paths), the Discord plugin has no install record, so
+  # OpenClaw treats it as untrusted and refuses the keyed storage it needs at
+  # registration. Plugins inside the gateway package's own dist/extensions
+  # count as "bundled" and are trusted, so copy the gateway and add
+  # nix-openclaw's hash-pinned build of the official @openclaw/discord package
+  # there. This grants that plugin trust without OpenClaw's provenance check;
+  # only ever put the official package here. A full copy is needed because
+  # OpenClaw resolves its package root through symlinks and rejects
+  # out-of-package bundled-dir overrides. Drop this once #158 is fixed.
+  gatewayWithDiscord =
+    pkgs.runCommand "openclaw-gateway-with-discord-${pkgs.openclaw-gateway.version}" { }
+      ''
+        cp -a ${pkgs.openclaw-gateway} $out
+        chmod -R u+w $out
+        cp -a ${pkgs.openclawRuntimePlugins.discord} $out/lib/node_modules/openclaw/dist/extensions/discord
+        substituteInPlace $out/bin/openclaw --replace-fail ${pkgs.openclaw-gateway} $out
+      '';
 in
 {
   sops.secrets."llm_providers/openai_key" = { };
@@ -58,8 +82,9 @@ in
         user = ./openclaw-workspace/USER.md;
       };
 
-      # Discord is an external runtime plugin; this packages it immutably.
-      runtimePlugins = [ "discord" ];
+      # The batteries bundle (tools on PATH), built on the gateway above that
+      # bundles Discord; hence no runtimePlugins = [ "discord" ].
+      package = pkgs.openclaw.override { openclaw-gateway = gatewayWithDiscord; };
 
       config = {
         gateway = {
@@ -81,6 +106,8 @@ in
           # login); the embedded runtime uses OPENAI_API_KEY directly.
           models."openai/gpt-6-sol".agentRuntime.id = "openclaw";
         };
+
+        plugins.entries.discord.enabled = true;
 
         channels.discord = {
           enabled = true;
