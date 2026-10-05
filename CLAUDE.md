@@ -13,7 +13,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 .
 ├── .sops.yaml                             # SOPS creation rules and public Age recipients for encrypted files under secrets/.
 ├── README.md                              # Repo overview, supporting files, services, and workflow docs.
-├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix (plus hermes-agent's NixOS module for homelab); hardware config read from /etc/nixos/hardware-configuration.nix on the host.
+├── flake.nix                              # Defines NixOS/Home Manager outputs and imports sops-nix (plus hermes-agent's and nix-openclaw's NixOS modules for homelab, with nix-openclaw's packages passed as the openclawPackages specialArg); hardware config read from /etc/nixos/hardware-configuration.nix on the host.
 ├── flake.lock                             # Pinned input versions for the flake.
 ├── configurations/
 │   ├── common/
@@ -30,8 +30,9 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── homelab/
 │   │   ├── configuration.nix              # Main host module: packages, networking, users, and service options; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; }) for its sops-nix wiring, and ../common/wireguard.nix (with NAT out ens18).
 │   │   ├── domain.nix                     # Defines the shared baseDomain module arg used by proxy.nix and homer.nix.
-│   │   ├── hermes.nix                     # Hermes Agent service (hermes-agent flake input's NixOS module): Discord (one allowlisted user ID from sops), model via the OpenAI API (openai-api provider) with OPENAI_API_KEY rendered from sops (llm_providers/openai_key), CLI on PATH.
+│   │   ├── hermes.nix                     # Hermes Agent service (currently disabled; its proxy vhost and Homer link are gated on enable) (hermes-agent flake input's NixOS module): Discord (one allowlisted user ID from sops), model via the OpenAI API (openai-api provider) with OPENAI_API_KEY rendered from sops (llm_providers/openai_key), CLI on PATH.
 │   │   ├── homer.nix                      # Homer dashboard config listing links to other services.
+│   │   ├── openclaw.nix                   # OpenClaw gateway via nix-openclaw's NixOS module (services.openclaw-gateway): loopback-only, no gateway auth, model openai/gpt-6-sol on the embedded runtime with OPENAI_API_KEY from sops, Discord via the prebuilt runtime plugin (bot token and one allowlisted user ID from sops), Nix mode.
 │   │   └── proxy.nix                      # nginx reverse proxy and ACME wildcard certificate config.
 │   └── thinkpad/
 │       └── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, and ../common/wireguard.nix (client-only, no NAT).
@@ -42,7 +43,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │   ├── zellij.nix                         # Zellij config (Dracula theme, full pane frames, no zsh auto-start) with a zellaude tab bar (Claude Code activity per tab; pinned release wasm, jq for its hook) on top and a zjstatus (nixpkgs zellijPlugins) + zjstatus-hints (pinned release wasm) keybinding-hints bar on the bottom; imported by zircon.nix.
 │   └── zircon.nix                         # Home Manager module for the zircon user (shared by standalone + thinkpad + desktop); imports shell.nix, gtk.nix, alias.nix, and zellij.nix; configures kitty as the terminal (programs.kitty: font, tab bar, pane-splitting keybindings, command_palette keybinding); bootstraps Spacemacs into ~/.emacs.d on first activation (home.activation.installSpacemacs) alongside the emacs package.
 ├── secrets/
-│   └── common.yaml                        # SOPS-encrypted shared secrets: Synology CIFS credentials (homelab, thinkpad, and desktop), Namecheap API credentials (homelab proxy.nix ACME DNS challenge), the OpenAI API key (llm_providers/openai_key) and Discord bot token/allowed user ID (discord_secrets), both used by homelab hermes.nix, per-host WireGuard wg0 configs (homelab, thinkpad, and desktop, common/wireguard.nix), the DDNS Updater Namecheap account password (common/namecheap-ddns-updater.nix, used by homelab; domain and provider are no longer sops-sourced), and Resilio Sync's license/WebUI credentials (common/resilio.nix, used by thinkpad and desktop).
+│   └── common.yaml                        # SOPS-encrypted shared secrets: Synology CIFS credentials (homelab, thinkpad, and desktop), Namecheap API credentials (homelab proxy.nix ACME DNS challenge), the OpenAI API key (llm_providers/openai_key) and Discord bot token/allowed user ID (discord_secrets), both used by homelab hermes.nix and openclaw.nix, per-host WireGuard wg0 configs (homelab, thinkpad, and desktop, common/wireguard.nix), the DDNS Updater Namecheap account password (common/namecheap-ddns-updater.nix, used by homelab; domain and provider are no longer sops-sourced), and Resilio Sync's license/WebUI credentials (common/resilio.nix, used by thinkpad and desktop).
 └── scripts/
     ├── pull-and-rebuild.sh                # Pulls latest changes and runs nixos-rebuild switch for a given configuration.
     ├── pull-and-rebuild-home.sh           # Pulls latest changes and runs home-manager switch for a given home configuration.
