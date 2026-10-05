@@ -2,7 +2,7 @@
 # service via its NixOS module. The model is reached through the OpenAI API,
 # and the gateway talks to Discord, answering only one allowlisted user; all
 # credentials are held in sops.
-{ config, ... }:
+{ config, lib, ... }:
 
 {
   sops.secrets."llm_providers/openai_key" = { };
@@ -22,7 +22,8 @@
   };
 
   services.hermes-agent = {
-    enable = true;
+    # Disabled for now; proxy.nix and homer.nix drop their Hermes entries with it.
+    enable = false;
     # Puts `hermes` on PATH with HERMES_HOME pointing at the service's state.
     addToSystemPackages = true;
     environmentFiles = [ config.sops.templates."hermes.env".path ];
@@ -52,5 +53,5 @@
 
   # HERMES_HOME (/var/lib/hermes/.hermes), including the .env holding the
   # secrets, is only readable by the hermes group, so the interactive CLI needs it.
-  users.users.user.extraGroups = [ "hermes" ];
+  users.users.user.extraGroups = lib.mkIf config.services.hermes-agent.enable [ "hermes" ];
 }
