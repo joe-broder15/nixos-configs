@@ -1,9 +1,9 @@
 # OpenClaw gateway, set up the way nix-openclaw's agent-first guide does it:
 # its Home Manager module (programs.openclaw, wired in by flake.nix) running a
 # systemd user service for `user`, with Nix-managed workspace bootstrap files.
-# The model is reached through the OpenAI API, and the gateway talks to
-# Discord, answering only one allowlisted user; all credentials are held in
-# sops.
+# The model runs on the Codex harness via the OpenAI API, and the gateway
+# talks to Discord, answering only one allowlisted user; all credentials are
+# held in sops.
 {
   config,
   lib,
@@ -14,31 +14,43 @@
 let
   homeDir = config.users.users.user.home;
 
+  # Official plugins bundled into the gateway below: Discord for the channel,
+  # Codex for the agent runtime (it ships its own pinned, static Codex binary).
+  bundledPlugins = [
+    "discord"
+    "codex"
+  ];
+
   # Workaround for nix-openclaw#158 (accepted risk): loaded via runtimePlugins
-  # (plugins.load.paths), the Discord plugin has no install record, so
-  # OpenClaw treats it as untrusted and refuses the keyed storage it needs at
+  # (plugins.load.paths), these plugins have no install record, so OpenClaw
+  # treats them as untrusted and refuses the keyed storage they need at
   # registration. Plugins inside the gateway package's own dist/extensions
   # count as "bundled" and are trusted, so copy the gateway and add
-  # nix-openclaw's hash-pinned build of the official @openclaw/discord package
-  # there. This grants that plugin trust without OpenClaw's provenance check;
-  # only ever put the official package here. A full copy is needed because
+  # nix-openclaw's hash-pinned builds of the official @openclaw/* packages
+  # there. This grants those plugins trust without OpenClaw's provenance check;
+  # only ever put official packages here. A full copy is needed because
   # OpenClaw resolves its package root through symlinks and rejects
   # out-of-package bundled-dir overrides. Drop this once #158 is fixed.
-  gatewayWithDiscord =
-    pkgs.runCommand "openclaw-gateway-with-discord-${pkgs.openclaw-gateway.version}" { }
+  gatewayWithPlugins =
+    pkgs.runCommand "openclaw-gateway-with-plugins-${pkgs.openclaw-gateway.version}" { }
       ''
         cp -a ${pkgs.openclaw-gateway} $out
         chmod -R u+w $out
         root=$out/lib/node_modules/openclaw
-        cp -a ${pkgs.openclawRuntimePlugins.discord} $root/dist/extensions/discord
-        chmod -R u+w $root/dist/extensions/discord
-        # OpenClaw's resolver fast path loads every relative .js import under
-        # dist/ as ESM, which breaks the plugin's CommonJS deps
-        # (discord-api-types). Keep them outside dist/ behind a symlink; Node
-        # resolves modules by real path, so they take the default resolver.
-        mkdir -p $root/plugin-deps/discord
-        mv $root/dist/extensions/discord/node_modules $root/plugin-deps/discord/node_modules
-        ln -s ../../../plugin-deps/discord/node_modules $root/dist/extensions/discord/node_modules
+        ${lib.concatMapStrings (id: ''
+          cp -a ${pkgs.openclawRuntimePlugins.${id}} $root/dist/extensions/${id}
+          chmod -R u+w $root/dist/extensions/${id}
+          # OpenClaw's resolver fast path loads every relative .js import under
+          # dist/ as ESM, which breaks CommonJS deps (e.g. discord-api-types).
+          # Keep them outside dist/ behind a symlink; Node resolves modules by
+          # real path, so they take the default resolver.
+          mkdir -p $root/plugin-deps/${id}
+          mv $root/dist/extensions/${id}/node_modules $root/plugin-deps/${id}/node_modules
+          ln -s ../../../plugin-deps/${id}/node_modules $root/dist/extensions/${id}/node_modules
+          # The plugin's openclaw peer dep links to the original gateway; point
+          # it at this copy so the plugin shares the gateway's SDK instance.
+          ln -sfn $out/lib/openclaw $root/plugin-deps/${id}/node_modules/openclaw
+        '') bundledPlugins}
         substituteInPlace $out/bin/openclaw --replace-fail ${pkgs.openclaw-gateway} $out
       '';
 in
@@ -92,8 +104,8 @@ in
       };
 
       # The batteries bundle (tools on PATH), built on the gateway above that
-      # bundles Discord; hence no runtimePlugins = [ "discord" ].
-      package = pkgs.openclaw.override { openclaw-gateway = gatewayWithDiscord; };
+      # bundles the plugins; hence no runtimePlugins.
+      package = pkgs.openclaw.override { openclaw-gateway = gatewayWithPlugins; };
 
       config = {
         gateway = {
@@ -110,13 +122,16 @@ in
 
         agents.defaults = {
           model.primary = "openai/gpt-6-sol";
-          # Without an explicit runtime, OpenAI models may be routed to the
-          # Codex app-server harness (a separate plugin wanting a ChatGPT
-          # login); the embedded runtime uses OPENAI_API_KEY directly.
-          models."openai/gpt-6-sol".agentRuntime.id = "openclaw";
+          # Run turns on the Codex app-server harness, failing closed instead
+          # of falling back to the embedded runtime. With no ChatGPT login
+          # (`openclaw models auth login --provider openai`), Codex
+          # authenticates with OPENAI_API_KEY.
+          models."openai/gpt-6-sol".agentRuntime.id = "codex";
         };
 
-        plugins.entries.discord.enabled = true;
+        plugins.entries = lib.genAttrs bundledPlugins (_: {
+          enabled = true;
+        });
 
         channels.discord = {
           enabled = true;
