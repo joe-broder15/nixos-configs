@@ -107,6 +107,28 @@ Four helper scripts live in `scripts/`:
 
 Ensure scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
 
+### Homelab passwordless rebuilds
+
+On homelab only, the `user` account may run the exact command used by
+`./scripts/rebuild.sh homelab` and `./scripts/pull-and-rebuild.sh homelab`
+without a sudo password:
+
+```sh
+sudo /run/current-system/sw/bin/nixos-rebuild switch --impure --flake /home/user/nixos-configs#homelab
+```
+
+The checkout must be at `/home/user/nixos-configs`. If it lives elsewhere, update
+the exact path in homelab's `security.sudo.extraRules` before applying the change.
+Activate this configuration once with the existing password-authenticated sudo
+access; subsequent script runs use the passwordless rule. Git pulls still run as
+the invoking user.
+
+The rule is limited to `user` running this command as root with these exact
+arguments. Other commands, configuration names, and flags retain their existing
+sudo policy; thinkpad and desktop are unaffected. Since rebuilding can activate
+arbitrary system changes, write access to this checkout effectively grants root
+access through the allowed rebuild.
+
 ## Rebuild commands
 
 - homelab: `sudo nixos-rebuild switch --flake /path/to/nixos-configs#homelab`
