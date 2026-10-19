@@ -53,16 +53,10 @@
           /etc/nixos/hardware-configuration.nix
           ./configurations/homelab/configuration.nix
           sops-nix.nixosModules.sops
-          # Home Manager here only carries OpenClaw for `user`, following
-          # nix-openclaw's agent-first setup (its overlay + Home Manager module);
-          # configured in configurations/homelab/openclaw.nix.
-          home-manager.nixosModules.home-manager
-          {
-            nixpkgs.overlays = [ nix-openclaw.overlays.default ];
-            home-manager.useGlobalPkgs = true;
-            home-manager.useUserPackages = true;
-            home-manager.sharedModules = [ nix-openclaw.homeManagerModules.openclaw ];
-          }
+          # OpenClaw as a system service (nix-openclaw's overlay + NixOS
+          # module); configured in configurations/homelab/openclaw.nix.
+          nix-openclaw.nixosModules.openclaw-gateway
+          { nixpkgs.overlays = [ nix-openclaw.overlays.default ]; }
         ];
       };
 
@@ -72,8 +66,7 @@
           /etc/nixos/hardware-configuration.nix
           ./configurations/thinkpad/configuration.nix
           # zircon's profile is only NixOS-integrated on the desktop-class hosts:
-          # homelab is a headless server with no zircon session to manage
-          # (its Home Manager only carries OpenClaw for `user`).
+          # homelab is a headless server with no zircon session to manage.
           home-manager.nixosModules.home-manager
           {
             home-manager.useGlobalPkgs = true;
