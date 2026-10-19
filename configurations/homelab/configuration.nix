@@ -99,6 +99,7 @@
 
   # Match the command used by both system rebuild scripts, without granting
   # passwordless access to other nixos-rebuild actions, flakes, or arguments.
+  # Nix's double backslash emits the literal backslash sudoers needs before #.
   # Keep this path in sync with the homelab checkout location.
   security.sudo.extraRules = [
     {
@@ -106,7 +107,7 @@
       runAs = "root";
       commands = [
         {
-          command = "/run/current-system/sw/bin/nixos-rebuild switch --impure --flake /home/user/nixos-configs#homelab";
+          command = "/run/current-system/sw/bin/nixos-rebuild switch --impure --flake /home/user/nixos-configs\\#homelab";
           options = [ "NOPASSWD" ];
         }
       ];
