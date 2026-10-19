@@ -165,10 +165,11 @@ in
         # The bootstrap files are Nix-managed (prepareState above), so
         # OpenClaw must not seed its own.
         skipBootstrap = true;
-        model.primary = "openai/gpt-6-sol";
+        # gpt-6-sol is API-key only; gpt-5.6-sol is available with the ChatGPT sign-in.
+        model.primary = "openai/gpt-5.6-sol";
         # Run turns on the Codex app-server harness, failing closed instead
         # of falling back to the embedded runtime.
-        models."openai/gpt-6-sol".agentRuntime.id = "codex";
+        models."openai/gpt-5.6-sol".agentRuntime.id = "codex";
       };
 
       plugins.entries = lib.genAttrs bundledPlugins (_: {
