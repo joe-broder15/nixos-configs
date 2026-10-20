@@ -21,6 +21,7 @@ let
   simplePorts = {
     plex = 32400; # Plex's fixed default port
     resilio = 9999; # must match configuration.nix's services.resilio.httpListenPort
+    openclaw = 18789; # must match openclaw.nix's gateway.port
     ddns = 8081; # common/namecheap-ddns-updater.nix's LISTENING_ADDRESS
   };
 in

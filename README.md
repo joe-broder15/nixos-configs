@@ -89,6 +89,26 @@ The Synology CIFS credentials (shared by homelab, thinkpad, and desktop via `con
 - Resilio Sync: `https://resilio.local.clubtropicalexcellent.vip`
 - DDNS Updater: `https://ddns.local.clubtropicalexcellent.vip`
 - Proxmox: `https://proxmox.local.clubtropicalexcellent.vip`
+- OpenClaw: `https://openclaw.local.clubtropicalexcellent.vip`
+
+## OpenClaw Control UI
+
+The Control UI is enabled at `https://openclaw.local.clubtropicalexcellent.vip`
+and linked from Homer. nginx uses the existing wildcard certificate and proxies
+HTTP and WebSocket traffic to the loopback-only gateway on `127.0.0.1:18789`.
+Ensure the OpenClaw hostname resolves to homelab, like the other service names.
+
+Sign in with the existing gateway token (`openclaw/gateway_token` in sops).
+New browsers may also need device approval on homelab as `user`:
+
+```sh
+openclaw devices list
+openclaw devices approve <requestId>
+```
+
+The gateway trusts only nginx's loopback source for forwarded client addresses
+and allows the exact HTTPS dashboard origin. Configuration remains managed by
+Nix; change it in this repository and rebuild rather than through the UI.
 
 ## Resilio notes
 
