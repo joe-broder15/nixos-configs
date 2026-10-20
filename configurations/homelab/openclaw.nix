@@ -69,17 +69,18 @@ let
     paths = map builtins.dirOf (lib.splitString ":" package.OPENCLAW_TOOLS_PATH);
   };
 
-  # Nix-managed workspace bootstrap files. OpenClaw needs all five, and they
-  # are replaced on every gateway start (USER.md included), so learned facts
-  # belong in MEMORY.md / memory/.
+  # Nix-managed workspace bootstrap files. These are authoritative policy and
+  # identity inputs, so they are replaced on every gateway start. USER.md is
+  # intentionally separate: it is seeded once below, then maintained by the
+  # agent as durable user context.
   bootstrapFiles = {
     "AGENTS.md" = ./openclaw-workspace/AGENTS.md;
     # Tsume, the head-maid persona.
     "SOUL.md" = ./openclaw-workspace/SOUL.md;
     "TOOLS.md" = ./openclaw-workspace/TOOLS.md;
     "IDENTITY.md" = ./openclaw-workspace/IDENTITY.md;
-    "USER.md" = ./openclaw-workspace/USER.md;
   };
+  userFileTemplate = ./openclaw-workspace/USER.md;
 
   # Runs as `user` before each gateway start, doing what the Home Manager
   # module did at activation.
@@ -91,6 +92,11 @@ let
         install -m 0644 ${src} ${workspaceDir}/${name}
       '') bootstrapFiles
     )}
+    # Seed USER.md for a fresh state directory, but never overwrite agent
+    # updates on subsequent gateway starts or NixOS rebuilds.
+    if [ ! -e ${workspaceDir}/USER.md ]; then
+      install -m 0644 ${userFileTemplate} ${workspaceDir}/USER.md
+    fi
     profile=${stateDir}/agents/main/agent/codex-home/home/.nix-profile
     mkdir -p "$profile"
     ln -sfn ${toolsProfile}/bin "$profile/bin"
