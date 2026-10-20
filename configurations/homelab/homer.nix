@@ -48,6 +48,11 @@ in
               url = "https://resilio.${baseDomain}";
             }
             {
+              name = "OpenClaw";
+              icon = "fas fa-robot";
+              url = "https://openclaw.${baseDomain}";
+            }
+            {
               name = "DDNS Updater";
               logo = logo "ddns-updater";
               url = "https://ddns.${baseDomain}";

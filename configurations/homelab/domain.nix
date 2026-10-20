@@ -1,5 +1,5 @@
-# Shared base domain for the homelab reverse proxy (proxy.nix) and dashboard
-# (homer.nix), injected as a module argument so both stay in sync.
+# Shared base domain for the homelab reverse proxy (proxy.nix), dashboard
+# (homer.nix), and OpenClaw browser origin (openclaw.nix).
 { ... }:
 {
   # "local." subdomain keeps this apart from the public "ddns." domain used by

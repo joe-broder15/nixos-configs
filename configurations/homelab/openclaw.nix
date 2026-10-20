@@ -9,6 +9,7 @@
   config,
   lib,
   pkgs,
+  baseDomain,
   ...
 }:
 
@@ -149,9 +150,14 @@ in
       gateway = {
         mode = "local";
         bind = "loopback";
-        # Loopback-only and not reverse-proxied. A shared token is still
-        # required: without it, local clients lacking a paired device
-        # identity (e.g. the `openclaw gateway status` probe) are rejected.
+        port = 18789; # must match proxy.nix's openclaw upstream
+        # nginx terminates HTTPS and forwards WebSocket connections locally.
+        trustedProxies = [ "127.0.0.1" ];
+        controlUi = {
+          enabled = true;
+          allowedOrigins = [ "https://openclaw.${baseDomain}" ];
+        };
+        # Both browser clients and the CLI still require the shared token.
         auth = {
           mode = "token";
           token = "\${OPENCLAW_GATEWAY_TOKEN}";
