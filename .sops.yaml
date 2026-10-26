@@ -7,6 +7,7 @@ keys:
   - &server_thinkpad age15z4qps9f499qa760845sassdgyhfyqs5j9w7ak87ts7x360t0qzsf5tqlm
   - &server_homelab age15j8e9w0efnnzhefc6xpmdnewy4ldskkqlq69s75tf9uqt8w7jsrsah7e8f
   - &server_desktop age19n97w93rt2kuggak9wcppx5srnrt693qfcgwytg8jxnakkhvtvlqqtnld2
+  - &admin_desktop age1q0ymen03ksxd8knh0snluwwy7t9fvxflu0xyee3gjnhtcyjw9qmqgmg375
 creation_rules:
   - path_regex: secrets/[^/]+\.(yaml|json|env|ini)$
     key_groups:
@@ -15,3 +16,4 @@ creation_rules:
         - *server_thinkpad
         - *server_homelab
         - *server_desktop
+        - *admin_desktop
