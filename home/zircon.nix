@@ -13,6 +13,7 @@
     ./terminator.nix
     ./vscode.nix
     ./zellij.nix
+    ./opencode.nix
   ];
 
   # Set explicitly (not mkDefault) so standalone `home-manager switch --flake .#zircon`
@@ -89,12 +90,6 @@
       size = 11;
     };
     settings.cursor.style.shape = "Beam";
-  };
-
-  # Theme lives in tui.json (not opencode.json) for current opencode releases.
-  programs.opencode = {
-    enable = true;
-    tui.theme = "dracula";
   };
 
   programs.home-manager.enable = true;
