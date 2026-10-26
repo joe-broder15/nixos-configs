@@ -37,6 +37,7 @@
     obsidian
     claude-code
     codex
+    code-cursor
     chatgptDesktop
     gh
     gnomeExtensions.dash-to-panel
@@ -85,6 +86,12 @@
       size = 11;
     };
     settings.cursor.style.shape = "Beam";
+  };
+
+  # Theme lives in tui.json (not opencode.json) for current opencode releases.
+  programs.opencode = {
+    enable = true;
+    tui.theme = "dracula";
   };
 
   programs.home-manager.enable = true;
