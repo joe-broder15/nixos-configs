@@ -17,6 +17,7 @@ let
   homeDir = config.users.users.user.home;
   stateDir = "${homeDir}/.openclaw";
   workspaceDir = "${stateDir}/workspace";
+  homelabctl = pkgs.callPackage ./homelabctl { };
 
   # Official plugins bundled into the gateway below: Discord for the channel,
   # Codex for the agent runtime (it ships its own pinned, static Codex binary).
@@ -66,8 +67,12 @@ let
   # in its per-agent home (linked by prepareState below).
   toolsProfile = pkgs.symlinkJoin {
     name = "openclaw-tools";
-    paths = map builtins.dirOf (lib.splitString ":" package.OPENCLAW_TOOLS_PATH);
+    paths = (map builtins.dirOf (lib.splitString ":" package.OPENCLAW_TOOLS_PATH)) ++ [
+      homelabctl
+    ];
   };
+
+  homelabctlSkill = ./openclaw-workspace/skills/homelabctl/SKILL.md;
 
   # Nix-managed workspace bootstrap files. These are authoritative policy and
   # identity inputs, so they are replaced on every gateway start. USER.md is
@@ -97,6 +102,8 @@ let
     if [ ! -e ${workspaceDir}/USER.md ]; then
       install -m 0644 ${userFileTemplate} ${workspaceDir}/USER.md
     fi
+    install -d -m 0755 ${workspaceDir}/skills/homelabctl
+    install -m 0644 ${homelabctlSkill} ${workspaceDir}/skills/homelabctl/SKILL.md
     profile=${stateDir}/agents/main/agent/codex-home/home/.nix-profile
     mkdir -p "$profile"
     ln -sfn ${toolsProfile}/bin "$profile/bin"
@@ -136,7 +143,25 @@ in
 
   # The CLI, run as `user`, uses the service's config (the state dir is its
   # default ~/.openclaw already), in Nix mode like the gateway.
-  environment.systemPackages = [ package ];
+  environment.systemPackages = [
+    package
+    homelabctl
+  ];
+
+  # Passwordless sudo only for this binary (any args). Verbs, the unit
+  # denylist, and the homelab-only flake target are enforced inside homelabctl.
+  security.sudo.extraRules = [
+    {
+      users = [ "user" ];
+      runAs = "root";
+      commands = [
+        {
+          command = "${lib.getExe homelabctl} *";
+          options = [ "NOPASSWD" ];
+        }
+      ];
+    }
+  ];
   environment.variables = {
     OPENCLAW_CONFIG_PATH = config.services.openclaw-gateway.configPath;
     OPENCLAW_NIX_MODE = "1";

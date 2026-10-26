@@ -8,7 +8,8 @@ NixOS configurations for homelab machines, built with flakes.
 Opinionated NixOS configuration for the homelab server running on a Proxmox VM.
 - `configurations/homelab/configuration.nix` is the main module for host/system settings; it also imports the shared `configurations/common/base.nix` module for common host defaults, `configurations/common/crypto.nix` and `configurations/common/synology.nix` modules for a CIFS mount at `//synology.local/Library1` with credentials rendered by sops-nix, along with `configurations/common/namecheap-ddns-updater.nix` (imported as `(import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })`) for its sops-nix wiring and the shared `configurations/common/wireguard.nix` module (parameterized with its own secret key and NAT'd out `ens18`).
 - `configurations/homelab/proxy.nix` contains nginx reverse-proxy and ACME certificate settings.
-- `configurations/homelab/openclaw.nix` runs the OpenClaw gateway as a system service via `nix-openclaw`'s NixOS module (running as `user` with state in `~/.openclaw`, workspace files in `configurations/homelab/openclaw-workspace/`), running `openai/gpt-5.6-terra` on the Codex app-server harness (official Codex plugin) signed in with ChatGPT (`openclaw models auth login --provider openai --device-code`; no API key), connected to Discord through the official Discord plugin; both plugins are bundled into a copy of the gateway package as a workaround for nix-openclaw#158 (runtime-plugin loading fails OpenClaw's plugin trust check), with the bot token and allowed user ID from sops (`discord_secrets`).
+- `configurations/homelab/openclaw.nix` runs the OpenClaw gateway as a system service via `nix-openclaw`'s NixOS module (running as `user` with state in `~/.openclaw`, workspace files in `configurations/homelab/openclaw-workspace/`), running `openai/gpt-5.6-terra` on the Codex app-server harness (official Codex plugin) signed in with ChatGPT (`openclaw models auth login --provider openai --device-code`; no API key), connected to Discord through the official Discord plugin; both plugins are bundled into a copy of the gateway package as a workaround for nix-openclaw#158 (runtime-plugin loading fails OpenClaw's plugin trust check), with the bot token and allowed user ID from sops (`discord_secrets`). It also installs `homelabctl` (from `configurations/homelab/homelabctl/`) on PATH and in the Codex tools profile, seeds `skills/homelabctl/SKILL.md` into the workspace, and grants `user` passwordless sudo for that binary only.
+- `configurations/homelab/homelabctl/` is the stdlib Python CLI OpenClaw uses to restart/status/log services and deploy the homelab flake; output is JSON-only.
 - `configurations/common/namecheap-ddns-updater.nix` is a `{ domain }: { ... }` function containing the DDNS Updater package, its sops-nix secrets/template, and the `services.ddns-updater` block; it hardcodes `provider = "namecheap"`, takes `domain` as a parameter, and sources only the account password from sops-nix. It lives under `configurations/common/` but is only imported by homelab.
 - Hardware configuration is read from `/etc/nixos/hardware-configuration.nix` on the host (not versioned in this repo).
 
@@ -120,34 +121,26 @@ Nix; change it in this repository and rebuild rather than through the UI.
 
 Four helper scripts live in `scripts/`:
 
-- `scripts/pull-and-rebuild.sh <closure>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `sudo nixos-rebuild switch --impure --flake <repo-root>#<closure>`.
+- `scripts/pull-and-rebuild.sh <closure>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `sudo nixos-rebuild switch --impure --flake <repo-root>#<closure>`. If `<closure>` is `homelab` and `homelabctl` is on PATH, it runs `homelabctl deploy --pull` instead.
 - `scripts/pull-and-rebuild-home.sh <name>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `home-manager switch --flake <repo-root>#<name>` for a `homeConfigurations` entry (e.g. `zircon`). No `sudo`, since Home Manager activates as the invoking user.
-- `scripts/rebuild.sh <closure>` – same as `pull-and-rebuild.sh` but skips the `git pull`, rebuilding from the working tree as-is.
+- `scripts/rebuild.sh <closure>` – same as `pull-and-rebuild.sh` but skips the `git pull`, rebuilding from the working tree as-is. If `<closure>` is `homelab` and `homelabctl` is on PATH, it runs `homelabctl deploy` instead.
 - `scripts/rebuild-home.sh <name>` – same as `pull-and-rebuild-home.sh` but skips the `git pull`, switching from the working tree as-is.
 
 Ensure scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
 
 ### Homelab passwordless rebuilds
 
-On homelab only, the `user` account may run the exact command used by
-`./scripts/rebuild.sh homelab` and `./scripts/pull-and-rebuild.sh homelab`
-without a sudo password:
+On homelab only, the `user` account may run `homelabctl` without a sudo
+password (any arguments). The binary re-execs itself via `sudo -n`; allowed
+verbs, the unit denylist, and the locked `#homelab` flake target are enforced
+in Python. That is also how `./scripts/rebuild.sh homelab` and
+`./scripts/pull-and-rebuild.sh homelab` rebuild once `homelabctl` is on PATH.
 
-```sh
-sudo /run/current-system/sw/bin/nixos-rebuild switch --impure --flake /home/user/nixos-configs#homelab
-```
-
-The checkout must be at `/home/user/nixos-configs`. If it lives elsewhere, update
-the exact path in homelab's `security.sudo.extraRules` before applying the change.
-Activate this configuration once with the existing password-authenticated sudo
-access; subsequent script runs use the passwordless rule. Git pulls still run as
-the invoking user.
-
-The rule is limited to `user` running this command as root with these exact
-arguments. Other commands, configuration names, and flags retain their existing
-sudo policy; thinkpad and desktop are unaffected. Since rebuilding can activate
-arbitrary system changes, write access to this checkout effectively grants root
-access through the allowed rebuild.
+The checkout must be at `/home/user/nixos-configs`. Other commands,
+configuration names, and flags retain their existing sudo policy; thinkpad and
+desktop are unaffected. Since deploying can activate arbitrary system changes,
+write access to this checkout effectively grants root through `homelabctl
+deploy`.
 
 ## Rebuild commands
 

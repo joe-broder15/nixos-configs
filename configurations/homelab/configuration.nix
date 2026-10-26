@@ -97,22 +97,9 @@
     ];
   };
 
-  # Match the command used by both system rebuild scripts, without granting
-  # passwordless access to other nixos-rebuild actions, flakes, or arguments.
-  # Nix's double backslash emits the literal backslash sudoers needs before #.
-  # Keep this path in sync with the homelab checkout location.
-  security.sudo.extraRules = [
-    {
-      users = [ "user" ];
-      runAs = "root";
-      commands = [
-        {
-          command = "/run/current-system/sw/bin/nixos-rebuild switch --impure --flake /home/user/nixos-configs\\#homelab";
-          options = [ "NOPASSWD" ];
-        }
-      ];
-    }
-  ];
+  # Passwordless sudo for rebuilds is granted only through homelabctl (see
+  # openclaw.nix), not a raw nixos-rebuild command, so the agent cannot skip
+  # that interface.
 
   # rslsync user/group are created automatically by the resilio module.
   systemd.tmpfiles.rules = [
