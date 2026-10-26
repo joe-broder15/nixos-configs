@@ -10,7 +10,6 @@
     ./shell.nix
     ./gtk.nix
     ./alias.nix
-    ./kitty.nix
     ./terminator.nix
     ./vscode.nix
     ./zellij.nix
@@ -53,6 +52,9 @@
   # GNOME extensions installed via home.packages must be explicitly enabled by UUID.
   # Dash to Panel reads its pinned/favorite apps from the same favorite-apps key
   # GNOME Shell's default dash uses, rather than a separate setting of its own.
+  # Top-bar clock in 12-hour (AM/PM) format.
+  dconf.settings."org/gnome/desktop/interface".clock-format = "12h";
+
   dconf.settings."org/gnome/shell" = {
     enabled-extensions = [
       pkgs.gnomeExtensions.dash-to-panel.extensionUuid
@@ -78,7 +80,7 @@
     };
   };
 
-  # Same font as kitty.nix; GohuFont is a bitmap font, so size must be 11 or 14.
+  # GohuFont is a bitmap font, so size must be 11 or 14.
   programs.alacritty = {
     enable = true;
     theme = "dracula";
