@@ -11,6 +11,7 @@
     ../common/resilio.nix
     ../common/hosts.nix
     ../common/logitech.nix
+    ../common/github-cli.nix
     (import ../common/wireguard.nix { secretKey = "wireguard_secrets/desktop_proton_vpn_config"; })
   ];
 

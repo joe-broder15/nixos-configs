@@ -8,6 +8,7 @@
     ../common/resilio.nix
     ../common/hosts.nix
     ../common/logitech.nix
+    ../common/github-cli.nix
     # No natExternalInterface: this laptop is only ever a wg0 client, never a gateway for other hosts.
     (import ../common/wireguard.nix { secretKey = "wireguard_secrets/thinkpad_proton_vpn_config"; })
   ];
