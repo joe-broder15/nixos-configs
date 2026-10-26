@@ -37,6 +37,7 @@
     obsidian
     claude-code
     codex
+    grok-build
     code-cursor
     chatgptDesktop
     gh
