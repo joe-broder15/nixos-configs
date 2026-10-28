@@ -213,6 +213,22 @@ in
         enabled = true;
       });
 
+      # OpenClaw 2026.9.5 (this nix-openclaw pin) projects `mcp.servers` into
+      # the Codex app-server on thread/start as native `mcp_servers`. A
+      # `command` is stdio: Codex spawns that process in the gateway, so this
+      # host does not run a loopback HTTP listener. The `codex` block is
+      # OpenClaw metadata and is stripped before the handoff; `approve` is
+      # server-wide, because these tools only query public Nix APIs and a
+      # stricter session posture would otherwise prompt on each open-world call.
+      mcp.servers.mcp-nixos = {
+        transport = "stdio";
+        command = lib.getExe pkgs.mcp-nixos;
+        codex = {
+          agents = [ "main" ];
+          defaultToolsApprovalMode = "approve";
+        };
+      };
+
       channels.discord = {
         enabled = true;
         token = {
