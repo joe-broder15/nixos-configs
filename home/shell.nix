@@ -16,20 +16,9 @@
       ];
     };
 
-    shellAliases = {
-      ll = "ls -lhrt";
-      gs = "git status";
-      # Reload the zircon Home Manager config from this repo's flake. Resolves
-      # the repo root at runtime, so it works wherever the repo is cloned (run
-      # from anywhere inside the working tree).
-      hmr = "home-manager switch --flake \"$(git rev-parse --show-toplevel)#zircon\"";
-      # Pull latest changes first, then reload.
-      hmp = "git -C \"$(git rev-parse --show-toplevel)\" pull && home-manager switch --flake \"$(git rev-parse --show-toplevel)#zircon\"";
-    };
-
     history = {
-      size = 10000;
-      save = 10000;
+      size = 100000;
+      save = 100000;
       ignoreDups = true;
       share = true;
     };
@@ -50,44 +39,57 @@
     enableZshIntegration = true;
     settings = {
       format = ''
-        [╭╴](fg:arrow)$username$os$git_branch(at $directory)$cmd_duration(via $python$conda$nodejs$c$rust$java)
+        [╭╴](fg:arrow)$username$hostname$os$git_branch$git_status (at $directory)$cmd_duration$time(via $python$conda$nodejs$c$rust$java$docker_context)
         [╰─](fg:arrow)$character'';
 
       add_newline = true;
 
       palette = "normal";
 
+      # Colors are Dracula's official palette (https://draculatheme.com);
+      # only 8 accents exist so several roles intentionally share a color.
       palettes.normal = {
-        arrow = "#333533";
-        os = "#16f4d0";
-        os_admin = "#e4ff1a";
-        directory = "#9ffff5";
-        time = "#bdfffd";
-        node = "#a5e6ba";
-        git = "#f17f29";
-        git_status = "#DFEBED";
-        python = "#edf67d";
-        conda = "#70e000";
-        java = "#F86279";
-        rust = "#ffdac6";
-        clang = "#caf0f8";
-        duration = "#ce4257";
-        text_color = "#EDF2F4";
-        text_light = "#26272A";
+        arrow = "#f8f8f2"; # foreground
+        os = "#8be9fd"; # cyan
+        os_admin = "#f1fa8c"; # yellow
+        directory = "#bd93f9"; # purple
+        time = "#6272a4"; # comment
+        node = "#50fa7b"; # green
+        git = "#ffb86c"; # orange
+        git_status = "#6272a4"; # comment
+        python = "#f1fa8c"; # yellow
+        conda = "#50fa7b"; # green
+        java = "#ff79c6"; # pink
+        rust = "#ffb86c"; # orange
+        clang = "#8be9fd"; # cyan
+        duration = "#ff5555"; # red
+        text_color = "#f8f8f2"; # foreground
+        text_light = "#282a36"; # background
       };
 
+      # Starship hides the username segment by default (only shows for root/SSH);
+      # force it on so it always renders.
       username = {
         style_user = "bold os";
         style_root = "bold os_admin";
-        format = "[  $user](fg:$style) ";
+        format = "[  $user](fg:$style)";
         disabled = false;
         show_always = true;
       };
 
+      # Starship only shows the hostname over SSH by default; force it on so
+      # it always renders (this config is shared across multiple hosts).
+      hostname = {
+        format = "[ 󰒋 $hostname](bold green) ";
+        ssh_only = false;
+        disabled = false;
+      };
+
+      # The os module is disabled by default in starship; opt in explicitly.
       os = {
         format = "on [($name)]($style) ";
         style = "bold blue";
-        disabled = true;
+        disabled = false;
         symbols = {
           Alpine = " ";
           Arch = " ";
@@ -124,7 +126,7 @@
       };
 
       time = {
-        disabled = true;
+        disabled = false;
         format = "at [󱑈 $time]($style)";
         time_format = "%H:%M";
         style = "bold fg:time";
@@ -145,22 +147,24 @@
       git_status = {
         format = "[ $all_status$ahead_behind ]($style)";
         style = "fg:text_color bg:git";
-        disabled = true;
+        disabled = false;
       };
 
       docker_context = {
-        disabled = true;
+        disabled = false;
         symbol = " ";
       };
 
       package.disabled = true;
 
+      # Only takes effect if $fill appears in `format` above; it currently doesn't.
       fill.symbol = " ";
 
       nodejs = {
         format = "[ $symbol$version ]($style)";
         style = "bg:node fg:text_light";
         symbol = " ";
+        # Show the bare version string; starship's default prepends a "v".
         version_format = "\${raw}";
         disabled = false;
       };
@@ -186,7 +190,7 @@
         style = "bg:java fg:text_light";
         version_format = "\${raw}";
         symbol = " ";
-        disabled = true;
+        disabled = false;
       };
 
       c = {
@@ -194,7 +198,7 @@
         style = "bg:clang fg:text_light";
         symbol = " ";
         version_format = "\${raw}";
-        disabled = true;
+        disabled = false;
       };
 
       rust = {
@@ -202,7 +206,7 @@
         style = "bg:rust fg:text_light";
         symbol = " ";
         version_format = "\${raw}";
-        disabled = true;
+        disabled = false;
       };
     };
   };

@@ -1,34 +1,29 @@
-{ config, pkgs, ... }:
+{ pkgs, ... }:
 
 {
+  imports = [
+    ../common/base.nix
+    ../common/crypto.nix
+    ../common/synology.nix
+    ../common/resilio.nix
+    ../common/hosts.nix
+    ../common/logitech.nix
+    ../common/github-cli.nix
+    # No natExternalInterface: this laptop is only ever a wg0 client, never a gateway for other hosts.
+    (import ../common/wireguard.nix { secretKey = "wireguard_secrets/thinkpad_proton_vpn_config"; })
+  ];
+
+  networking.hostName = "thinkpad-nixos";
+
   boot.loader.systemd-boot.enable = true;
   boot.loader.efi.canTouchEfiVariables = true;
-
-  networking.hostName = "nixos";
-  networking.networkmanager.enable = true;
-
-  time.timeZone = "America/Los_Angeles";
-
-  i18n.defaultLocale = "en_US.UTF-8";
-  i18n.extraLocaleSettings = {
-    LC_ADDRESS = "en_US.UTF-8";
-    LC_IDENTIFICATION = "en_US.UTF-8";
-    LC_MEASUREMENT = "en_US.UTF-8";
-    LC_MONETARY = "en_US.UTF-8";
-    LC_NAME = "en_US.UTF-8";
-    LC_NUMERIC = "en_US.UTF-8";
-    LC_PAPER = "en_US.UTF-8";
-    LC_TELEPHONE = "en_US.UTF-8";
-    LC_TIME = "en_US.UTF-8";
-  };
 
   services.xserver.enable = true;
   services.displayManager.gdm.enable = true;
   services.desktopManager.gnome.enable = true;
-  services.xserver.xkb = {
-    layout = "us";
-    variant = "";
-  };
+
+  services.power-profiles-daemon.enable = true;
+  services.upower.enable = true;
 
   services.printing.enable = true;
 
@@ -47,44 +42,19 @@
     extraGroups = [
       "networkmanager"
       "wheel"
-      "rslsync"
     ];
-    packages = with pkgs; [ ];
   };
 
   programs.firefox.enable = true;
 
-  nixpkgs.config.allowUnfree = true;
+  programs.steam.enable = true;
 
   environment.systemPackages = with pkgs; [
     vim
     git
     wget
     zsh
-    resilio-sync
     home-manager
     gnome-tweaks
   ];
-
-  services.resilio = {
-    enable = true;
-    enableWebUI = true;
-    httpListenAddr = "127.0.0.1";
-    httpListenPort = 9999;
-    directoryRoot = "/resilio-shared-folders";
-  };
-
-  # rslsync creates this dir as 0755 by default; setgid + group-write lets the
-  # zircon user (in the rslsync group) read and write synced files directly.
-  systemd.tmpfiles.rules = [
-    "d /resilio-shared-folders 2775 rslsync rslsync - -"
-  ];
-
-  nix.settings.experimental-features = [
-    "nix-command"
-    "flakes"
-  ];
-
-  # Do not change; tracks the NixOS release that initialized stateful data paths.
-  system.stateVersion = "25.05";
 }

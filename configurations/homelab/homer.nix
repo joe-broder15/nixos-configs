@@ -1,11 +1,15 @@
-{ ... }:
+{ baseDomain, ... }: # supplied by domain.nix's _module.args, shared with proxy.nix
 
+let
+  # Pulls icons from an external CDN at render time — no local asset caching.
+  logo = name: "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/${name}.png";
+in
 {
   services.homer = {
     enable = true;
     virtualHost = {
-      domain = "homer.local.clubtropicalexcellent.vip";
-      nginx.enable = true;
+      domain = "homer.${baseDomain}";
+      nginx.enable = true; # generates the vhost's serving config; proxy.nix only layers TLS on top
     };
     settings = {
       title = "Club Tropical Excellent";
@@ -18,43 +22,51 @@
           items = [
             {
               name = "Plex";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/plex.png";
-              url = "https://plex.local.clubtropicalexcellent.vip";
+              logo = logo "plex";
+              url = "https://plex.${baseDomain}";
+            }
+            {
+              # External site, not self-hosted/proxied — hence icon instead of logo.
+              name = "AnimeZ";
+              icon = "fas fa-tv";
+              url = "https://animez.to";
+            }
+            {
+              # External site, not self-hosted/proxied — hence icon instead of logo.
+              name = "proxybay";
+              icon = "fas fa-skull-crossbones";
+              url = "https://piratebay-proxylist.com/";
             }
             {
               name = "qBittorrent";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/qbittorrent.png";
-              url = "https://qBittorrent.local.clubtropicalexcellent.vip";
-
-            }
-            {
-              name = "SillyTavern";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/sillytavern.png";
-              url = "https://sillytavern.local.clubtropicalexcellent.vip";
+              logo = logo "qbittorrent";
+              url = "https://qbittorrent.${baseDomain}";
             }
             {
               name = "Resilio Sync";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/resiliosync.png";
-              url = "https://resilio.local.clubtropicalexcellent.vip";
+              logo = logo "resiliosync";
+              url = "https://resilio.${baseDomain}";
+            }
+            {
+              name = "OpenClaw";
+              icon = "fas fa-robot";
+              url = "https://openclaw.${baseDomain}";
             }
             {
               name = "DDNS Updater";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/ddns-updater.png";
-              url = "https://ddns.local.clubtropicalexcellent.vip";
+              logo = logo "ddns-updater";
+              url = "https://ddns.${baseDomain}";
             }
             {
-              name = "Open WebUI";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/open-webui.png";
-              url = "https://openwebui.local.clubtropicalexcellent.vip";
-            }
-            {
+              # proxy.nix reverse-proxies this to Proxmox's actual host at 192.168.1.100.
               name = "Proxmox";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/proxmox.png";
-              url = "https://proxmox.local.clubtropicalexcellent.vip";
+              logo = logo "proxmox";
+              url = "https://proxmox.${baseDomain}";
             }
             {
+              # Plain LAN IP, not proxied — router's own UI handles its own TLS/auth.
               name = "Router";
-              logo = "https://cdn.jsdelivr.net/gh/homarr-labs/dashboard-icons/png/router.png";
+              logo = logo "router";
               url = "http://192.168.1.1";
             }
           ];

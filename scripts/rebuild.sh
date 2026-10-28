@@ -12,4 +12,8 @@ fi
 
 CLOSURE_NAME="$1"
 
+if [[ "${CLOSURE_NAME}" == "homelab" ]] && command -v homelabctl >/dev/null 2>&1; then
+  exec homelabctl deploy
+fi
+
 sudo nixos-rebuild switch --impure --flake "${REPO_ROOT}#${CLOSURE_NAME}"
