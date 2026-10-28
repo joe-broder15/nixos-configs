@@ -265,6 +265,12 @@ in
   systemd.services.openclaw-gateway = {
     after = [ "network-online.target" ];
     wants = [ "network-online.target" ];
+    # Nix mode reads openclaw.json once, at process start. The unit's
+    # ExecStart path does not include that file, so a switch that only
+    # changes it leaves the old gateway running and the Codex thread keeps
+    # its previous MCP inventory. This store path changes with the file,
+    # which makes the activation restart the unit.
+    restartTriggers = [ config.environment.etc."openclaw/openclaw.json".source ];
     serviceConfig = {
       # Log to the journal instead of the module's log file.
       StandardOutput = lib.mkForce "journal";
