@@ -150,6 +150,8 @@ in
 
   # Passwordless sudo only for this binary (any args). Verbs, the unit
   # denylist, and the homelab-only flake target are enforced inside homelabctl.
+  # The denylist allows restart of openclaw-gateway and nothing else under
+  # that prefix.
   security.sudo.extraRules = [
     {
       users = [ "user" ];
