@@ -195,6 +195,15 @@ in
         };
       };
 
+      # Keyword-only memory recall: no embedding provider / vector index.
+      # Deliberate FTS-only (memory status reports fts-only); avoids the
+      # default OpenAI embeddings path, which needs an API key this host
+      # does not keep (ChatGPT sign-in only).
+      memory.search = {
+        provider = "none";
+        fallback = "none";
+      };
+
       # The implicit main agent, made explicit as the Home Manager module did.
       agents.entries.main = { };
       agents.defaults = {
