@@ -15,6 +15,10 @@ from typing import Mapping, NoReturn, Sequence
 DENIED_UNITS: frozenset[str] = frozenset({"reboot", "poweroff", "halt", "kexec"})
 # Prefix, not an exact unit, so a future openclaw helper unit stays blocked.
 DENIED_PREFIX: str = "openclaw"
+# Restart of this one service is the exception: Nix mode reads its config at
+# process start, so the agent has to restart it to load a new openclaw.json.
+# Status and logs stay denied, and any other openclaw* name stays denied.
+GATEWAY_RESTART_UNIT: str = "openclaw-gateway"
 # A missing window would dump the whole journal; the agent must pass a bound or get this.
 DEFAULT_LOG_SINCE: str = "1 hour ago"
 # Deploy cannot target thinkpad or desktop. The flake output is not an argument.
@@ -84,17 +88,24 @@ def normalize_unit(raw: str) -> str:
     return name
 
 
-def denied_reason(unit: str) -> str | None:
-    """Return a denial message, or None if this bare unit may be touched.
+def denied_reason(unit: str, *, command: str) -> str | None:
+    """Return a denial message, or None if this verb may touch this bare unit.
 
     Inputs:
         unit: bare service name, already normalized.
+        command: homelabctl verb, such as "status", "restart", or "logs".
     Outputs:
-        A denial string for openclaw* and reboot, poweroff, halt, and kexec. None when the unit is allowed.
+        A denial string for openclaw* (except restart of openclaw-gateway) and for reboot, poweroff, halt, and kexec. None when the unit is allowed.
     """
     lowered: str = unit.lower()
     # Case-fold the check. systemd treats unit names as case-sensitive.
-    if lowered in DENIED_UNITS or lowered.startswith(DENIED_PREFIX):
+    if lowered in DENIED_UNITS:
+        return f"unit {unit!r} is denied"
+    if lowered.startswith(DENIED_PREFIX):
+        # Exact name and exact verb. openclaw-gateway.socket and a restart of
+        # any other openclaw* unit stay blocked.
+        if command == "restart" and lowered == GATEWAY_RESTART_UNIT:
+            return None
         return f"unit {unit!r} is denied"
     return None
 
@@ -186,11 +197,12 @@ def read_status(unit: str) -> dict[str, object]:
     }
 
 
-def require_unit(raw: str) -> str:
+def require_unit(raw: str, *, command: str) -> str:
     """Validate and authorize a unit argument. Shared by status, restart, and logs.
 
     Inputs:
         raw: unit argument from the agent.
+        command: homelabctl verb. The openclaw-gateway restart exception depends on it.
     Outputs:
         Bare service name. Does not return when the name is invalid or denylisted.
     """
@@ -199,7 +211,7 @@ def require_unit(raw: str) -> str:
         unit: str = normalize_unit(raw)
     except ValueError as exc:
         emit_error("invalid_unit", str(exc))
-    reason: str | None = denied_reason(unit)
+    reason: str | None = denied_reason(unit, command=command)
     if reason is not None:
         emit_error("denied", reason)
     return unit
@@ -214,7 +226,7 @@ def cmd_status(unit_raw: str) -> NoReturn:
         Does not return. Writes a JSON status object to stdout and raises SystemExit(0), or an error object if the unit is rejected or missing.
     """
     # require_unit runs before systemctl, so a denied unit never reaches the manager.
-    emit(read_status(require_unit(unit_raw)), ok=True, exit_code=0)
+    emit(read_status(require_unit(unit_raw, command="status")), ok=True, exit_code=0)
 
 
 def cmd_restart(unit_raw: str) -> NoReturn:
@@ -225,7 +237,7 @@ def cmd_restart(unit_raw: str) -> NoReturn:
     Outputs:
         Does not return. Writes a JSON status object with command "restart" and raises SystemExit(0), or an error object if restart fails or the unit is rejected.
     """
-    unit: str = require_unit(unit_raw)
+    unit: str = require_unit(unit_raw, command="restart")
     name: str = service_unit(unit)
     completed: subprocess.CompletedProcess[str] = run(["systemctl", "restart", name])
     if completed.returncode != 0:
@@ -269,7 +281,7 @@ def cmd_logs(unit_raw: str, since: str, until: str | None, grep: str | None) -> 
     Outputs:
         Does not return. Writes a JSON object with command, unit, since, until, grep, and entries, then raises SystemExit(0). An empty match is success.
     """
-    unit: str = require_unit(unit_raw)
+    unit: str = require_unit(unit_raw, command="logs")
     name: str = service_unit(unit)
     argv: list[str] = [
         "journalctl",

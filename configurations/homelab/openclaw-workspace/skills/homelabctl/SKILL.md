@@ -40,8 +40,12 @@ Always rebuilds this host's `homelab` flake output from
 
 Refuse (status, restart, and logs):
 
-- any unit whose name starts with `openclaw` (including `openclaw-gateway`)
+- any unit whose name starts with `openclaw`, except `restart` of `openclaw-gateway`
 - `reboot`, `poweroff`, `halt`, `kexec`
+
+`homelabctl restart openclaw-gateway` is allowed. `status` and `logs` of that
+unit stay denied, and so does every other `openclaw*` name. Restarting the
+gateway ends the current turn; the next message runs on the new process.
 
 ## JSON
 
