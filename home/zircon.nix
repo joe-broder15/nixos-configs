@@ -29,6 +29,7 @@
     tmux
     brave
     nerd-fonts.gohufont
+    nerd-fonts.fira-code
     discord
     signal-desktop
     protonmail-desktop

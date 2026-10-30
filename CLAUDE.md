@@ -40,7 +40,7 @@ This repo defines NixOS configurations for homelab machines, built with flakes.
 │       └── configuration.nix              # ThinkPad T14 desktop config with GNOME/GDM; imports ../common/base.nix, ../common/crypto.nix and ../common/synology.nix for SOPS-managed CIFS credentials, ../common/resilio.nix for Resilio Sync, ../common/hosts.nix, ../common/logitech.nix, ../common/github-cli.nix for sops-rendered gh auth, and ../common/wireguard.nix (client-only, no NAT).
 ├── home/
 │   ├── alias.nix                          # Shell aliases (ll, gs, help, host-age-pubkey, user-age-pubkey, update-sops-keys, hmr, hmp, home, syno, jfu, wg-start, wg-stop, zls, za, zd, zka) imported by zircon.nix.
-│   ├── gtk.nix                            # GTK theme (Dracula, via pkgs.dracula-theme, incl. gtk4), icon theme (vanilla Papirus-Dark), cursor theme (Dracula-cursors, bundled in pkgs.dracula-theme), and system font (GohuFont 11 Nerd Font) config, imported by zircon.nix.
+│   ├── gtk.nix                            # GTK theme (Dracula, via pkgs.dracula-theme, incl. gtk4), icon theme (vanilla Papirus-Dark), cursor theme (Dracula-cursors, bundled in pkgs.dracula-theme), and system font (FiraCode Nerd Font 11) config, imported by zircon.nix.
 │   ├── opencode.nix                       # OpenCode config (programs.opencode): default model xai/grok-4.7 in opencode.json, Dracula theme in tui.json, and a local stdio mcp-nixos server (pkgs.mcp-nixos store path) under settings.mcp; imported by zircon.nix.
 │   ├── shell.nix                          # Shared zsh/bash/starship configuration imported by zircon.nix.
 │   ├── terminator.nix                     # Terminator terminal config (GohuFont 11 Nerd Font Mono, ibeam cursor, theme colors), imported by zircon.nix.

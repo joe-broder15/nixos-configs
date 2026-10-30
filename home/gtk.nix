@@ -24,10 +24,10 @@
       size = 32;
     };
 
-    # Font package is installed in zircon.nix (nerd-fonts.gohufont).
-    # GohuFont is a bitmap font; point size must be 11 or 14.
+    # Font package is installed in zircon.nix (nerd-fonts.fira-code).
+    # Terminal and editor fonts stay on GohuFont (alacritty, terminator, vscode).
     font = {
-      name = "GohuFont 11 Nerd Font";
+      name = "FiraCode Nerd Font";
       size = 11;
     };
 
@@ -54,7 +54,7 @@
       icon-theme = "Papirus-Dark";
       cursor-theme = "Dracula-cursors";
       color-scheme = "prefer-dark";
-      font-name = "GohuFont 11 Nerd Font 11";
+      font-name = "FiraCode Nerd Font 11";
     };
   };
 }
