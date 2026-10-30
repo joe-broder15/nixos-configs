@@ -28,8 +28,15 @@
   programs.bash = {
     enable = true;
     bashrcExtra = ''
+      # nix develop sources this file from its own rcfile before it exports
+      # PATH and IN_NIX_SHELL. exec'ing here replaces bash and that setup
+      # never runs, so the dev shell is empty (uv and the rest are missing).
       if [[ -z "$ZSH_VERSION" && $- == *i* ]]; then
-        exec zsh
+        if [[ ''${#BASH_SOURCE[@]} -gt 1 && ''${BASH_SOURCE[1]} == *nix-shell* ]]; then
+          PROMPT_COMMAND='exec zsh'
+        else
+          exec zsh
+        fi
       fi
     '';
   };
@@ -39,7 +46,7 @@
     enableZshIntegration = true;
     settings = {
       format = ''
-        [╭╴](fg:arrow)$username$hostname$os$git_branch$git_status (at $directory)$cmd_duration$time(via $python$conda$nodejs$c$rust$java$docker_context)
+        [╭╴](fg:arrow)$username$hostname$os$git_branch$git_status (at $directory)$cmd_duration$time( via $nix_shell$python$conda$nodejs$c$rust$java$docker_context)
         [╰─](fg:arrow)$character'';
 
       add_newline = true;
@@ -62,6 +69,7 @@
         java = "#ff79c6"; # pink
         rust = "#ffb86c"; # orange
         clang = "#8be9fd"; # cyan
+        nix = "#8be9fd"; # cyan
         duration = "#ff5555"; # red
         text_color = "#f8f8f2"; # foreground
         text_light = "#282a36"; # background
@@ -207,6 +215,18 @@
         symbol = " ";
         version_format = "\${raw}";
         disabled = false;
+      };
+
+      # heuristic stays off: on NixOS every PATH entry is under /nix/store, so
+      # starship would treat the normal shell as a nix shell.
+      nix_shell = {
+        disabled = false;
+        heuristic = false;
+        format = "[ $symbol$state( \\($name\\)) ]($style)";
+        symbol = " ";
+        style = "bg:nix fg:text_light";
+        impure_msg = "dev";
+        pure_msg = "pure";
       };
     };
   };
