@@ -2,6 +2,8 @@
   pkgs,
   lib,
   chatgptDesktop,
+  grokBot,
+  brave,
   ...
 }:
 
@@ -37,8 +39,8 @@
     keepassxc
     obsidian
     claude-code
-    codex
     grok-build
+    grokBot
     code-cursor
     chatgptDesktop
     gh
@@ -65,6 +67,7 @@
       "brave-browser.desktop"
       "Alacritty.desktop"
       "code.desktop"
+      "grok-bot.desktop"
       "org.gnome.Nautilus.desktop"
       "discord.desktop"
       "proton-mail.desktop"

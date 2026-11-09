@@ -17,24 +17,42 @@
       url = "git+https://github.com/joe-broder15/chatgpt-desktop-nix-flake.git?lfs=1";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Grok Bot desktop agent (proprietary .deb, amd64 only).
+    grok-bot = {
+      url = "github:jordangarrison/grok-bot-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # OpenClaw (homelab), via the official Nix packaging. Its overlay builds
     # against our nixpkgs; the input keeps its own pins for its tool flakes.
     nix-openclaw.url = "github:openclaw/nix-openclaw";
+    # Last nixpkgs commit that still packaged brave (1.96.61, 2026-10-04).
+    # Not followed to nixpkgs: unstable removed it on 2026-11-03. This pin
+    # does not move on a normal flake update.
+    nixpkgs-brave.url = "github:NixOS/nixpkgs/a322c65bf7233456788a9ebf03bc067db7dc090a";
   };
 
   outputs =
-    {
+    inputs@{
       nixpkgs,
       home-manager,
       sops-nix,
       chatgpt-desktop,
+      grok-bot,
       nix-openclaw,
       ...
     }:
     let
       system = "x86_64-linux";
+      # Only this package is taken from the pinned nixpkgs. The rest of the
+      # system stays on unstable.
+      brave = (import inputs.nixpkgs-brave {
+        inherit system;
+        config.allowUnfree = true;
+      }).brave;
       homeExtraSpecialArgs = {
+        inherit brave;
         chatgptDesktop = chatgpt-desktop.packages.${system}.default;
+        grokBot = grok-bot.packages.${system}.default;
       };
       # Built explicitly because homeConfigurations.zircon (below) needs a pkgs
       # argument directly; nixosSystem builds its own internally from `system`.
