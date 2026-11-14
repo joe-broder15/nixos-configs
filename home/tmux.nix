@@ -1,4 +1,4 @@
-{ pkgs, lib, ... }:
+{ pkgs, ... }:
 
 let
   # Not packaged in nixpkgs. Pin gpakosz/.tmux in the store so ~/.tmux.conf
@@ -9,6 +9,15 @@ let
     rev = "58a3dcc0d718ec0fa1c0d5a2fddd640a1ad7a5b7"; # 2026-08-08
     hash = "sha256-YDzbZVFhrAMBhOI8HVDxR3rEPkrEwG57IUbnZicmfn4=";
   };
+
+  # Same sample upstream ships, with mouse mode enabled. The build fails if
+  # that line moves, so a pin bump cannot silently drop the override.
+  tmuxConfLocal = pkgs.runCommand "tmux.conf.local" { } ''
+    sed 's/^#set -g mouse on$/set -g mouse on/' \
+      ${oh-my-tmux}/.tmux.conf.local > "$out"
+    test "$(grep -cx 'set -g mouse on' "$out")" = 1
+    test "$(grep -cx '#set -g mouse on' "$out")" = 0
+  '';
 in
 {
   # The shell half of .tmux.conf kills the server unless perl, sed, and awk
@@ -21,17 +30,13 @@ in
     gnugrep
   ];
 
-  # Upstream install: ~/.tmux.conf is a symlink to the repo's .tmux.conf.
-  # That file says not to edit it; overrides belong in ~/.tmux.conf.local.
+  # Symlink to the pinned upstream file. Do not edit it.
   home.file.".tmux.conf".source = "${oh-my-tmux}/.tmux.conf";
 
-  # Upstream copies .tmux.conf.local (tmux sources it as $TMUX_CONF.local, and
-  # prefix+e opens it). The store copy is mode 0444, so seed a writable file
-  # once and leave any existing override file alone.
-  home.activation.installOhMyTmuxLocal = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    local_conf="$HOME/.tmux.conf.local"
-    if [ ! -e "$local_conf" ] && [ ! -L "$local_conf" ]; then
-      $DRY_RUN_CMD ${pkgs.coreutils}/bin/install -m 644 ${oh-my-tmux}/.tmux.conf.local "$local_conf"
-    fi
-  '';
+  # Future overrides belong in this module, not in a hand-edited home file.
+  # force makes a rebuild replace an existing ~/.tmux.conf.local.
+  home.file.".tmux.conf.local" = {
+    source = tmuxConfLocal;
+    force = true;
+  };
 }
