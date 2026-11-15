@@ -15,6 +15,7 @@
     ./terminator.nix
     ./vscode.nix
     ./zellij.nix
+    ./tmux.nix
     ./opencode.nix
   ];
 
@@ -28,7 +29,6 @@
 
   home.packages = with pkgs; [
     spotify
-    tmux
     brave
     nerd-fonts.gohufont
     nerd-fonts.fira-code
