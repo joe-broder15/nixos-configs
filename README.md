@@ -8,8 +8,6 @@ NixOS configurations for homelab machines, built with flakes.
 Opinionated NixOS configuration for the homelab server running on a Proxmox VM.
 - `configurations/homelab/configuration.nix` is the main module for host/system settings; it also imports the shared `configurations/common/base.nix` module for common host defaults, `configurations/common/crypto.nix` and `configurations/common/synology.nix` modules for a CIFS mount at `//synology.local/Library1` with credentials rendered by sops-nix, along with `configurations/common/namecheap-ddns-updater.nix` (imported as `(import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })`) for its sops-nix wiring and the shared `configurations/common/wireguard.nix` module (parameterized with its own secret key and NAT'd out `ens18`).
 - `configurations/homelab/proxy.nix` contains nginx reverse-proxy and ACME certificate settings.
-- `configurations/homelab/openclaw.nix` runs the OpenClaw gateway as a system service via `nix-openclaw`'s NixOS module (running as `user` with state in `~/.openclaw`, workspace files in `configurations/homelab/openclaw-workspace/`), running `openai/gpt-5.6-terra` on the Codex app-server harness (official Codex plugin) signed in with ChatGPT (`openclaw models auth login --provider openai --device-code`; no API key), connected to Discord through the official Discord plugin; both plugins are bundled into a copy of the gateway package as a workaround for nix-openclaw#158 (runtime-plugin loading fails OpenClaw's plugin trust check), with the bot token and allowed user ID from sops (`discord_secrets`). Memory search is FTS-only (keyword): `memory.search.provider` and `memory.search.fallback` are both `"none"`, so embeddings/vector search (OpenClaw's default OpenAI embeddings path) are disabled — this host keeps no OpenAI API key. It also installs `homelabctl` (from `configurations/homelab/homelabctl/`) on PATH and in the Codex tools profile, seeds `skills/homelabctl/SKILL.md` into the workspace, and grants `user` passwordless sudo for that binary only. The gateway unit restarts when `openclaw.json` changes, because Nix mode reads that file only at process start.
-- `configurations/homelab/homelabctl/` is the stdlib Python CLI OpenClaw uses to restart/status/log services and deploy the homelab flake; output is JSON-only. `restart openclaw-gateway` is allowed; status, logs, and every other `openclaw*` unit stay denied.
 - `configurations/common/namecheap-ddns-updater.nix` is a `{ domain }: { ... }` function containing the DDNS Updater package, its sops-nix secrets/template, and the `services.ddns-updater` block; it hardcodes `provider = "namecheap"`, takes `domain` as a parameter, and sources only the account password from sops-nix. It lives under `configurations/common/` but is only imported by homelab.
 - Hardware configuration is read from `/etc/nixos/hardware-configuration.nix` on the host (not versioned in this repo).
 
@@ -79,7 +77,6 @@ The Synology CIFS credentials (shared by homelab, thinkpad, and desktop via `con
 - Plex Media Server.
 - Resilio Sync with WebUI and shared-folder root at `/resilio-shared-folders`.
 - ClamAV daemon and on-demand scanner.
-- OpenClaw gateway (Discord, one allowlisted user; ChatGPT sign-in, no API key; FTS-only keyword memory search, no embeddings).
 - CIFS mount for `//synology.local/Library1`.
 - Miscellaneous CLI tooling: `vim`, `wget`, `htop`, `fastfetch`, `tree`, `wireguard-tools`, etc.
 
@@ -91,26 +88,6 @@ The Synology CIFS credentials (shared by homelab, thinkpad, and desktop via `con
 - Resilio Sync: `https://resilio.local.clubtropicalexcellent.vip`
 - DDNS Updater: `https://ddns.local.clubtropicalexcellent.vip`
 - Proxmox: `https://proxmox.local.clubtropicalexcellent.vip`
-- OpenClaw: `https://openclaw.local.clubtropicalexcellent.vip`
-
-## OpenClaw Control UI
-
-The Control UI is enabled at `https://openclaw.local.clubtropicalexcellent.vip`
-and linked from Homer. nginx uses the existing wildcard certificate and proxies
-HTTP and WebSocket traffic to the loopback-only gateway on `127.0.0.1:18789`.
-Ensure the OpenClaw hostname resolves to homelab, like the other service names.
-
-Sign in with the existing gateway token (`openclaw/gateway_token` in sops).
-New browsers may also need device approval on homelab as `user`:
-
-```sh
-openclaw devices list
-openclaw devices approve <requestId>
-```
-
-The gateway trusts only nginx's loopback source for forwarded client addresses
-and allows the exact HTTPS dashboard origin. Configuration remains managed by
-Nix; change it in this repository and rebuild rather than through the UI.
 
 ## Resilio notes
 
@@ -122,26 +99,12 @@ Nix; change it in this repository and rebuild rather than through the UI.
 
 Four helper scripts live in `scripts/`:
 
-- `scripts/pull-and-rebuild.sh <closure>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `sudo nixos-rebuild switch --impure --flake <repo-root>#<closure>`. If `<closure>` is `homelab` and `homelabctl` is on PATH, it runs `homelabctl deploy --pull` instead.
+- `scripts/pull-and-rebuild.sh <closure>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `sudo nixos-rebuild switch --impure --flake <repo-root>#<closure>`.
 - `scripts/pull-and-rebuild-home.sh <name>` – runs `git -C <repo-root> pull --ff-only` (where `<repo-root>` is resolved from the script location), then runs `home-manager switch --flake <repo-root>#<name>` for a `homeConfigurations` entry (e.g. `zircon`). No `sudo`, since Home Manager activates as the invoking user.
-- `scripts/rebuild.sh <closure>` – same as `pull-and-rebuild.sh` but skips the `git pull`, rebuilding from the working tree as-is. If `<closure>` is `homelab` and `homelabctl` is on PATH, it runs `homelabctl deploy` instead.
+- `scripts/rebuild.sh <closure>` – same as `pull-and-rebuild.sh` but skips the `git pull`, rebuilding from the working tree as-is.
 - `scripts/rebuild-home.sh <name>` – same as `pull-and-rebuild-home.sh` but skips the `git pull`, switching from the working tree as-is.
 
 Ensure scripts are executable (`chmod +x scripts/*.sh`). They assume the repository is cloned on the target machine and that `sudo` is configured.
-
-### Homelab passwordless rebuilds
-
-On homelab only, the `user` account may run `homelabctl` without a sudo
-password (any arguments). The binary re-execs itself via `sudo -n`; allowed
-verbs, the unit denylist, and the locked `#homelab` flake target are enforced
-in Python. That is also how `./scripts/rebuild.sh homelab` and
-`./scripts/pull-and-rebuild.sh homelab` rebuild once `homelabctl` is on PATH.
-
-The checkout must be at `/home/user/nixos-configs`. Other commands,
-configuration names, and flags retain their existing sudo policy; thinkpad and
-desktop are unaffected. Since deploying can activate arbitrary system changes,
-write access to this checkout effectively grants root through `homelabctl
-deploy`.
 
 ## Rebuild commands
 
