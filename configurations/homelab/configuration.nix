@@ -12,7 +12,6 @@
     ./domain.nix
     ./proxy.nix
     ./homer.nix
-    ./openclaw.nix
     (import ../common/namecheap-ddns-updater.nix { domain = "ddns.clubtropicalexcellent.vip"; })
     (import ../common/wireguard.nix {
       secretKey = "wireguard_secrets/homelab_proton_vpn_config";
@@ -96,10 +95,6 @@
       "wheel" # sudo access; convenience for this shared homelab account
     ];
   };
-
-  # Passwordless sudo for rebuilds is granted only through homelabctl (see
-  # openclaw.nix), not a raw nixos-rebuild command, so the agent cannot skip
-  # that interface.
 
   # rslsync user/group are created automatically by the resilio module.
   systemd.tmpfiles.rules = [

@@ -21,7 +21,6 @@ let
   simplePorts = {
     plex = 32400; # Plex's fixed default port
     resilio = 9999; # must match configuration.nix's services.resilio.httpListenPort
-    openclaw = 18789; # must match openclaw.nix's gateway.port
     ddns = 8081; # common/namecheap-ddns-updater.nix's LISTENING_ADDRESS
   };
 in
@@ -61,22 +60,6 @@ in
   services.nginx.virtualHosts =
     lib.mapAttrs' (name: port: lib.nameValuePair "${name}.${baseDomain}" (localProxy port)) simplePorts
     // {
-      # OpenClaw validates forwarded client attribution. Its upstream must see
-      # only the address nginx observed, never a client-supplied X-Forwarded-For
-      # chain. Keep the standard WebSocket settings from localProxy.
-      "openclaw.${baseDomain}" = lib.recursiveUpdate (localProxy 18789) {
-        locations."/" = {
-          recommendedProxySettings = false;
-          extraConfig = ''
-            proxy_set_header Host $host;
-            proxy_set_header X-Real-IP $remote_addr;
-            proxy_set_header X-Forwarded-For $remote_addr;
-            proxy_set_header X-Forwarded-Proto $scheme;
-            proxy_set_header X-Forwarded-Host $host;
-          '';
-        };
-      };
-
       # homer.nix's services.homer module already creates this vhost's serving
       # config (virtualHost.nginx.enable); this entry only adds TLS to it.
       "homer.${baseDomain}" = {

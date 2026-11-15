@@ -22,9 +22,6 @@
       url = "github:jordangarrison/grok-bot-flake";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    # OpenClaw (homelab), via the official Nix packaging. Its overlay builds
-    # against our nixpkgs; the input keeps its own pins for its tool flakes.
-    nix-openclaw.url = "github:openclaw/nix-openclaw";
     # Last nixpkgs commit that still packaged brave (1.96.61, 2026-10-04).
     # Not followed to nixpkgs: unstable removed it on 2026-11-03. This pin
     # does not move on a normal flake update.
@@ -38,7 +35,6 @@
       sops-nix,
       chatgpt-desktop,
       grok-bot,
-      nix-openclaw,
       ...
     }:
     let
@@ -71,10 +67,6 @@
           /etc/nixos/hardware-configuration.nix
           ./configurations/homelab/configuration.nix
           sops-nix.nixosModules.sops
-          # OpenClaw as a system service (nix-openclaw's overlay + NixOS
-          # module); configured in configurations/homelab/openclaw.nix.
-          nix-openclaw.nixosModules.openclaw-gateway
-          { nixpkgs.overlays = [ nix-openclaw.overlays.default ]; }
         ];
       };
 
