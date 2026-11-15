@@ -12,13 +12,18 @@ let
 
   # Same sample upstream ships, with mouse mode on and the Powerline
   # separators (\uE0B0–\uE0B3) active. The "|" separators stay commented.
-  # GohuFont Nerd Font already has those glyphs. The build fails if the
-  # lines move, so a pin bump cannot silently drop the overrides.
+  # The prefix indicator (Ctrl-b / Ctrl-a) is a Nerd Font bolt in theme
+  # yellow instead of the faint gray keyboard glyph. GohuFont is a bitmap
+  # face, so a color emoji would not fit the status cell; the bolt is in
+  # the Nerd Font patch. The build fails if those lines move.
   tmuxConfLocal = pkgs.runCommand "tmux.conf.local" { } ''
     sed \
       -e 's/^#set -g mouse on$/set -g mouse on/' \
       -e 's/^tmux_conf_theme_\(left\|right\)_separator_\(main\|sub\)=/#&/' \
       -e 's/^#\(tmux_conf_theme_\(left\|right\)_separator_\(main\|sub\)=.*\\uE0B[0-3].*\)/\1/' \
+      -e 's|^tmux_conf_theme_prefix=.*|tmux_conf_theme_prefix='"'"'\\uF0E7'"'"'|' \
+      -e 's|^tmux_conf_theme_prefix_fg="none"|tmux_conf_theme_prefix_fg="#ffff00"|' \
+      -e 's|^tmux_conf_theme_prefix_attr="none"|tmux_conf_theme_prefix_attr="bold"|' \
       ${oh-my-tmux}/.tmux.conf.local > "$out"
     test "$(grep -cx 'set -g mouse on' "$out")" = 1
     test "$(grep -cx '#set -g mouse on' "$out")" = 0
@@ -35,6 +40,10 @@ let
     grep -q "^tmux_conf_theme_right_separator_main='\\\\uE0B2'" "$out"
     grep -q "^tmux_conf_theme_right_separator_sub='\\\\uE0B3'" "$out"
     test "$(grep -c "^#tmux_conf_theme_.*separator_.*=.*\\\\uE0B" "$out")" = 0
+    grep -qx "tmux_conf_theme_prefix='\\\\uF0E7'" "$out"
+    grep -qx 'tmux_conf_theme_prefix_fg="#ffff00"' "$out"
+    grep -qx 'tmux_conf_theme_prefix_attr="bold"' "$out"
+    test "$(grep -c '⌨' "$out")" = 0
   '';
 in
 {
